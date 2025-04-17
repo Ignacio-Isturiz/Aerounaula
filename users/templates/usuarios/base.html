@@ -1,0 +1,65 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Aerounaula{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f9f9f9;
+        }
+        .navbar-custom {
+            background-color: #2b0a3d;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            color: white !important;
+            margin-right: 1rem;
+        }
+        .nav-link.active {
+            border-bottom: 3px solid #f50057;
+        }
+        .btn-vuelos {
+            background-color: #f50057;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+
+{% if not ocultar_navbar %}
+<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+    <div class="container-fluid px-5">
+        <a class="navbar-brand text-white" href="/">✈ Aerounaula</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/vuelos/' %}active{% endif %}" href="{% url 'vuelos' %}">Vuelos</a>
+                </li>
+            </ul>
+            {% if request.session.usuario_id %}
+                <span class="me-3 text-white">👤 {{ request.session.usuario_nombre }}</span>
+                <a href="{% url 'logout' %}" class="btn btn-outline-light">Cerrar sesión</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline-light">Iniciar sesión</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+{% endif %}
+
+<div class="container" style="padding-top: 6rem;">
+    {% block content %}
+    {% endblock %}
+</div>
+
+</body>
+</html>

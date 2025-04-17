@@ -10,6 +10,8 @@ from dbmodels.models.usuario import Usuario
 from .forms import LoginForm, RegistroForm, RecuperarClaveForm, RestablecerClaveForm
 from django.utils.timezone import make_aware
 from axes.decorators import axes_dispatch
+from django.http import HttpResponseRedirect
+from dbmodels.models.vuelos import Vuelos
 
 # ---------------------- GENERAR TOKEN ----------------------
 def generar_token():
@@ -40,10 +42,11 @@ def login_view(request):
                 messages.error(request, "Usuario no registrado.")
     else:
         form = LoginForm()
-    
+
     context = {
         'form': form,
-        'titulo': 'Inicio de sesión'
+        'titulo': 'Inicio de sesión',
+        'ocultar_navbar': True
     }
     return render(request, 'usuarios/login.html', context)
 
@@ -69,7 +72,6 @@ def registro_view(request):
                 )
                 nuevo_usuario.save()
 
-                # Enviar correo de confirmación
                 url_confirmacion = request.build_absolute_uri(f"/confirmar/{token}/")
                 html_content = render_to_string('correos/confirmacion_cuenta.html', {
                     'nombre': nuevo_usuario.nombre,
@@ -88,7 +90,7 @@ def registro_view(request):
     else:
         form = RegistroForm()
 
-    return render(request, 'usuarios/registro.html', {'form': form, 'titulo': 'Registro'})
+    return render(request, 'usuarios/registro.html', {'form': form, 'titulo': 'Registro', 'ocultar_navbar': True})
 
 
 # ---------------------- CONFIRMACIÓN DE CUENTA ----------------------
@@ -101,19 +103,37 @@ def confirmar_cuenta(request, token):
         usuario.save()
         messages.success(request, "Cuenta confirmada con éxito. Ahora puedes iniciar sesión.")
     except Usuario.DoesNotExist:
-        messages.error(request, "Token inválido o expirado.")
+        messages.error(request, "Token inválido o caducado.")
     return redirect('login')
 
 
 # ---------------------- DASHBOARD Y LOGOUT ----------------------
 def dashboard(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
-    return render(request, 'usuarios/dashboard.html')
+    usuario_id = request.session.get('usuario_id')
+    usuario_nombre = request.session.get('usuario_nombre')
+
+    context = {
+        'logueado': bool(usuario_id),
+        'usuario_nombre': usuario_nombre,
+        'ocultar_navbar': False
+    }
+
+    response = render(request, 'usuarios/dashboard.html', context)
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
+
 
 def logout_view(request):
     request.session.flush()
-    return redirect('login')
+    request.session.clear_expired()
+
+    response = HttpResponseRedirect('/')
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 
 # ---------------------- RECUPERAR CLAVE ----------------------
@@ -129,7 +149,6 @@ def recuperar_clave(request):
                 usuario.fechatoken = timezone.now()
                 usuario.save()
 
-                # Enviar correo de restablecimiento
                 enlace = request.build_absolute_uri(f"/restablecer/{token}/")
                 html_content = render_to_string('correos/restablecer_clave.html', {
                     'nombre': usuario.nombre,
@@ -150,12 +169,10 @@ def recuperar_clave(request):
     else:
         form = RecuperarClaveForm()
 
-    return render(request, 'usuarios/recuperar_clave.html', {'form': form, 'titulo': 'Recuperar contraseña'})
+    return render(request, 'usuarios/recuperar_clave.html', {'form': form, 'titulo': 'Recuperar contraseña', 'ocultar_navbar': True})
 
 
 # ---------------------- RESTABLECER CONTRASEÑA ----------------------
-from django.utils.timezone import make_aware
-
 def restablecer_clave(request, token):
     try:
         usuario = Usuario.objects.get(token=token)
@@ -183,6 +200,18 @@ def restablecer_clave(request, token):
     else:
         form = RestablecerClaveForm()
 
-    return render(request, 'usuarios/restablecer_contraseña.html', {'form': form, 'titulo': 'Restablecer contraseña'})
+    return render(request, 'usuarios/restablecer_contraseña.html', {'form': form, 'titulo': 'Restablecer contraseña', 'ocultar_navbar': True})
 
-    
+
+# ---------------------- VER VUELOS ----------------------
+def vuelos_view(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+
+    vuelos = Vuelos.objects.filter(estado='Disponible')
+    context = {
+        'vuelos': vuelos,
+        'usuario_nombre': request.session.get('usuario_nombre'),
+        'ocultar_navbar': False
+    }
+    return render(request, 'usuarios/vuelos.html', context)

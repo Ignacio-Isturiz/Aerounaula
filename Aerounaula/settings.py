@@ -53,6 +53,9 @@ INSTALLED_APPS = [
 
     #Seguridad
     'axes',
+    
+    'django.contrib.humanize',
+
 ]
 
 MIDDLEWARE = [
