@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmación de Cuenta</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f7f7f7; padding: 20px;">
+    <div style="background-color: #ffffff; padding: 30px; border-radius: 10px;">
+        <h2 style="color: #2c3e50;">¡Hola {{ nombre }}!</h2>
+        <p>Gracias por registrarte en nuestro sistema.</p>
+        <p>Por favor, confirma tu cuenta haciendo clic en el siguiente botón:</p>
+
+        <p style="text-align: center; margin: 30px 0;">
+            <a href="{{ url_confirmacion }}" style="background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                Confirmar Cuenta
+            </a>
+        </p>
+
+        <p>Si no solicitaste este registro, simplemente ignora este mensaje.</p>
+
+        <p style="margin-top: 40px;">Saludos,<br><strong>Equipo del Sistema</strong></p>
+    </div>
+</body>
+</html>
