@@ -4,11 +4,21 @@ from django import forms
 class LoginForm(forms.Form):
     correo = forms.EmailField(
         label="Correo electrónico",
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'})
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control mb-3',
+            'placeholder': 'Correo electrónico',
+            'autocomplete': 'email'
+        })
     )
     clave = forms.CharField(
         label="Contraseña",
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'})
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control mb-3',
+            'placeholder': 'Contraseña',
+            'autocomplete': 'current-password'
+        })
     )
 
 # ---------------------- REGISTRO ----------------------

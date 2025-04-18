@@ -1,0 +1,32 @@
+
+        body {
+            background-color: #f9f9f9;
+        }
+        .navbar-custom {
+            background: linear-gradient(to right, #b52d00, #ff9f1a);
+        }        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            color:#ffffff !important;
+            margin-right: 1rem;
+        }
+        .nav-link.active {
+            border-bottom: 3px solid #db0101;
+        }
+        .btn-vuelos {
+            background-color: #5100ff;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 20px;
+        }
+
+        .btn-outline-light:hover {
+            background-color: #fde1ae;
+            color: #986404; /* naranja por ejemplo */
+            border-color: #fde1ae;
+        }
+        

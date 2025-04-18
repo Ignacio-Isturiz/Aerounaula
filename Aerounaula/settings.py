@@ -160,3 +160,8 @@ AXES_LOCKOUT_CALLABLE = None
 AXES_RESET_ON_SUCCESS = True  # Reinicia contador si inicia sesión bien
 AXES_ONLY_USER_FAILURES = True  # Solo bloquea si el usuario existe
 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # Esto busca en la carpeta static global
+]
+
