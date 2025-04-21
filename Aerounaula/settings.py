@@ -154,14 +154,22 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
-AXES_FAILURE_LIMIT = 5
+AXES_LOCK_OUT_AT_FAILURE = True 
+AXES_REDIRECT_ON_LOCKOUT = False 
+AXES_FAILURE_LIMIT = 3
 AXES_COOLOFF_TIME = 1
 AXES_ONLY_USER_FAILURES = True
 AXES_RESET_ON_SUCCESS = True
+AXES_USERNAME_FORM_FIELD = 'correo'
+AXES_USERNAME_CALLABLE = lambda request, credentials: credentials.get('correo') if credentials else None
+
+
 AUTHENTICATION_BACKENDS = [
-    'axes.backends.AxesBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'users.backends.UsuarioBackend',
 ]
+
+
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [

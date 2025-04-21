@@ -12,6 +12,10 @@ from django.utils.timezone import make_aware
 from axes.decorators import axes_dispatch
 from django.http import HttpResponseRedirect
 from dbmodels.models.vuelos import Vuelos
+from django.contrib.auth import authenticate
+from axes.attempts import reset_user_attempts
+from axes.utils import reset
+from axes.handlers.proxy import AxesProxyHandler
 
 # ---------------------- GENERAR TOKEN ----------------------
 def generar_token():
@@ -19,27 +23,40 @@ def generar_token():
 
 
 # ---------------------- LOGIN ----------------------
-@axes_dispatch
+from axes.handlers.proxy import AxesProxyHandler
+
 def login_view(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
             correo = form.cleaned_data['correo']
             clave = form.cleaned_data['clave']
-            try:
-                usuario = Usuario.objects.get(correo=correo)
-                if not usuario.estado:
-                    messages.error(request, "Usuario inactivo o bloqueado.")
-                elif not usuario.confirmado:
-                    messages.error(request, "Cuenta no confirmada.")
-                elif check_password(clave, usuario.clave):
-                    request.session['usuario_id'] = usuario.id_usuario
-                    request.session['usuario_nombre'] = usuario.nombre
-                    return redirect('dashboard')
-                else:
-                    messages.error(request, "Contraseña incorrecta.")
-            except Usuario.DoesNotExist:
-                messages.error(request, "Usuario no registrado.")
+
+            # Bloqueo activo → mostrar mensaje personalizado sin redirección
+            if AxesProxyHandler.is_locked(request, credentials={"correo": correo}):
+                messages.error(request, "Demasiados intentos fallidos. Tu cuenta ha sido bloqueada temporalmente.")
+                return render(request, 'usuarios/login.html', {
+                    'form': form,
+                    'titulo': 'Inicio de sesión',
+                    'ocultar_navbar': True
+                })
+
+            # Autenticación usando tu backend
+            usuario = authenticate(request, correo=correo, clave=clave)
+
+            if usuario is not None:
+                # Resetear el contador de intentos fallidos en Axes
+                AxesProxyHandler.reset_attempts(request)
+
+                # Crear sesión
+                request.session['usuario_id'] = usuario.id_usuario
+                request.session['usuario_nombre'] = usuario.nombre
+                return redirect('dashboard')
+            else:
+                # Si la autenticación falla, Axes automáticamente registra el intento
+                messages.error(request, "Correo o contraseña incorrectos.")
+        else:
+            messages.error(request, "Formulario no válido.")
     else:
         form = LoginForm()
 
@@ -49,7 +66,6 @@ def login_view(request):
         'ocultar_navbar': True
     }
     return render(request, 'usuarios/login.html', context)
-
 
 # ---------------------- REGISTRO ----------------------
 def registro_view(request):
