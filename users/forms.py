@@ -76,3 +76,4 @@ class RestablecerClaveForm(forms.Form):
 
         if nueva and confirmar and nueva != confirmar:
             raise forms.ValidationError("Las contraseñas no coinciden.")
+

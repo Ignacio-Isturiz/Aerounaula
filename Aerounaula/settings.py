@@ -154,14 +154,18 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
-AXES_FAILURE_LIMIT = 5  # Número de intentos antes de bloquear
-AXES_COOLOFF_TIME = 1  # Tiempo en horas que el bloqueo se mantiene
-AXES_LOCKOUT_CALLABLE = None
-AXES_RESET_ON_SUCCESS = True  # Reinicia contador si inicia sesión bien
-AXES_ONLY_USER_FAILURES = True  # Solo bloquea si el usuario existe
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1
+AXES_ONLY_USER_FAILURES = True
+AXES_RESET_ON_SUCCESS = True
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Esto busca en la carpeta static global
 ]
+
 

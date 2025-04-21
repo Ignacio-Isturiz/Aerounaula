@@ -16,6 +16,12 @@
         <form method="post" novalidate>
             {% csrf_token %}
 
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors.0 }}
+                </div>
+            {% endif %}
+
             <div class="mb-3 text-start">
                 {{ form.nueva_clave.label_tag }}
                 {{ form.nueva_clave }}
@@ -24,12 +30,24 @@
                 {% endif %}
             </div>
 
+            <div class="mb-3 text-start">
+                {{ form.confirmar_clave.label_tag }}
+                {{ form.confirmar_clave }}
+                {% if form.confirmar_clave.errors %}
+                    <div class="text-danger small">{{ form.confirmar_clave.errors.0 }}</div>
+                {% endif %}
+            </div>
+
             <button type="submit">Restablecer contraseña</button>
         </form>
 
-        {% for message in messages %}
-            <div class="alert alert-info mt-3">{{ message }}</div>
-        {% endfor %}
+        {% if messages %}
+            <div class="mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <div class="mt-4">
             <a href="{% url 'login' %}">Volver al inicio de sesión</a>
