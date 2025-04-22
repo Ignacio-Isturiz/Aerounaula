@@ -13,6 +13,8 @@ from django.http import HttpResponseRedirect
 from dbmodels.models.vuelos import Vuelos
 from django.contrib.auth import authenticate
 from axes.utils import reset 
+from axes.handlers.proxy import AxesProxyHandler
+
 
 # ---------------------- GENERAR TOKEN ----------------------
 
@@ -28,7 +30,6 @@ def login_view(request):
             correo = form.cleaned_data['correo']
             clave = form.cleaned_data['clave']
 
-            from axes.handlers.proxy import AxesProxyHandler
             if AxesProxyHandler().is_locked(request):
                 messages.error(request, "Demasiados intentos fallidos. Tu cuenta ha sido bloqueada temporalmente.")
                 return render(request, 'usuarios/login.html', {
