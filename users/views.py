@@ -9,21 +9,17 @@ from django.template.loader import render_to_string
 from dbmodels.models.usuario import Usuario
 from .forms import LoginForm, RegistroForm, RecuperarClaveForm, RestablecerClaveForm
 from django.utils.timezone import make_aware
-from axes.decorators import axes_dispatch
 from django.http import HttpResponseRedirect
 from dbmodels.models.vuelos import Vuelos
 from django.contrib.auth import authenticate
-from axes.attempts import reset_user_attempts
-from axes.utils import reset
-from axes.handlers.proxy import AxesProxyHandler
+from axes.utils import reset 
 
 # ---------------------- GENERAR TOKEN ----------------------
+
 def generar_token():
     return secrets.token_urlsafe(32)
 
-
 # ---------------------- LOGIN ----------------------
-from axes.handlers.proxy import AxesProxyHandler
 
 def login_view(request):
     if request.method == "POST":
@@ -32,8 +28,8 @@ def login_view(request):
             correo = form.cleaned_data['correo']
             clave = form.cleaned_data['clave']
 
-            # Bloqueo activo → mostrar mensaje personalizado sin redirección
-            if AxesProxyHandler.is_locked(request, credentials={"correo": correo}):
+            from axes.handlers.proxy import AxesProxyHandler
+            if AxesProxyHandler().is_locked(request):
                 messages.error(request, "Demasiados intentos fallidos. Tu cuenta ha sido bloqueada temporalmente.")
                 return render(request, 'usuarios/login.html', {
                     'form': form,
@@ -41,19 +37,17 @@ def login_view(request):
                     'ocultar_navbar': True
                 })
 
-            # Autenticación usando tu backend
+
             usuario = authenticate(request, correo=correo, clave=clave)
 
             if usuario is not None:
-                # Resetear el contador de intentos fallidos en Axes
-                AxesProxyHandler.reset_attempts(request)
+                reset(ip=request.META.get('REMOTE_ADDR'))
 
-                # Crear sesión
+
                 request.session['usuario_id'] = usuario.id_usuario
                 request.session['usuario_nombre'] = usuario.nombre
                 return redirect('dashboard')
             else:
-                # Si la autenticación falla, Axes automáticamente registra el intento
                 messages.error(request, "Correo o contraseña incorrectos.")
         else:
             messages.error(request, "Formulario no válido.")
