@@ -159,7 +159,7 @@ AXES_REDIRECT_ON_LOCKOUT = False
 AXES_FAILURE_LIMIT = 3
 AXES_COOLOFF_TIME = 1
 AXES_ONLY_USER_FAILURES = True
-AXES_RESET_ON_SUCCESS = True
+AXES_RESET_ON_SUCCESS = False
 AXES_USERNAME_FORM_FIELD = 'correo'
 AXES_USERNAME_CALLABLE = lambda request, credentials: credentials.get('correo') if credentials else None
 AXES_LOCKOUT_CALLABLE = 'utils.axes_utils.custom_lockout_response'
@@ -167,8 +167,9 @@ AXES_LOCKOUT_CALLABLE = 'utils.axes_utils.custom_lockout_response'
 
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    'axes.backends.AxesBackend',             
     'users.backends.UsuarioBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 

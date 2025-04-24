@@ -1,15 +1,34 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Cuenta Bloqueada</title>
-    <link rel="stylesheet" href="{% static 'css/formularios.css' %}">
+    <link rel="stylesheet" href="{% static 'css/alerta_bloqueado.css' %}">
 </head>
 <body>
-    <div class="card">
-        <h1>Cuenta Bloqueada</h1>
-        <p>Demasiados intentos fallidos.<br>Por seguridad, tu cuenta ha sido bloqueada.</p>
+    <div class="login-container">
+        <h2>Cuenta Bloqueada</h2>
+        <div class="alert">
+            Demasiados intentos fallidos de inicio de sesión.
+        </div>
+        <p class="countdown">
+            Serás redirigido al inicio de sesión en <span id="seconds" class="highlight">5</span> segundos...
+        </p>
     </div>
+
+    <script>
+        let seconds = 5;
+        const countdownElement = document.getElementById('seconds');
+
+        const interval = setInterval(function() {
+            seconds--;
+            countdownElement.textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(interval);
+                window.location.href = "{% url 'login' %}";
+            }
+        }, 1000);
+    </script>
 </body>
 </html>

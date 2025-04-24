@@ -1,0 +1,44 @@
+
+        body {
+            background: linear-gradient(to right, #b52d00, #ff9f1a);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            max-width: 400px;
+            background-color: white;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            color: #b52d00;
+            margin-bottom: 25px;
+        }
+
+        .countdown {
+            font-size: 16px;
+            color: #555;
+            margin-top: 20px;
+        }
+
+        .alert {
+            font-size: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #b52d00;
+        }
