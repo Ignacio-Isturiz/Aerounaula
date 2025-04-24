@@ -29,13 +29,12 @@ def login_view(request):
         if form.is_valid():
             correo = form.cleaned_data['correo']
             clave = form.cleaned_data['clave']
-
             if AxesProxyHandler().is_locked(request):
                 messages.error(request, "Demasiados intentos fallidos. Tu cuenta ha sido bloqueada temporalmente.")
-                return render(request, 'usuarios/login.html', {
+                return render(request, 'usuarios/cuenta_bloqueada.html', {
                     'form': form,
                     'titulo': 'Inicio de sesión',
-                    'ocultar_navbar': True
+                    'ocultar_navbar': False
                 })
 
 

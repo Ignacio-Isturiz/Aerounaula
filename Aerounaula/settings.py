@@ -74,7 +74,7 @@ ROOT_URLCONF = 'Aerounaula.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -162,6 +162,8 @@ AXES_ONLY_USER_FAILURES = True
 AXES_RESET_ON_SUCCESS = True
 AXES_USERNAME_FORM_FIELD = 'correo'
 AXES_USERNAME_CALLABLE = lambda request, credentials: credentials.get('correo') if credentials else None
+AXES_LOCKOUT_CALLABLE = 'utils.axes_utils.custom_lockout_response'
+
 
 
 AUTHENTICATION_BACKENDS = [
