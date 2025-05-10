@@ -2,7 +2,43 @@ from django.shortcuts import render, redirect, get_object_or_404
 from dbmodels.models.vuelos import Vuelos
 from dbmodels.models.reserva import Reserva
 from django.utils import timezone
+from dbmodels.models.asiento import Asiento 
+from dbmodels.models.usuario import Usuario  # Asegúrate de importar el modelo Usuario
 
+def asignar_asientos(request, id_vuelo):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+
+    usuario_id = request.session['usuario_id']
+    vuelo = get_object_or_404(Vuelos, pk=id_vuelo)
+
+    # Verifica que el vuelo le pertenece
+    if not Reserva.objects.filter(id_usuario=usuario_id, id_vuelo=vuelo).exists():
+        return redirect('mis_reservas')
+
+    # Asignamos la variable 'asientos' siempre, no solo en POST
+    asientos = Asiento.objects.filter(vuelo=vuelo).order_by('asiento_numero')
+    
+    # Se asegura que 'disponibles' tenga un valor incluso en GET
+    disponibles = asientos.filter(reservado=False)
+
+    if request.method == 'POST':
+        seleccionados = request.POST.getlist('asientos')
+        disponibles = asientos.filter(id__in=seleccionados, reservado=False)
+
+        # Obtén el objeto Usuario desde la base de datos con el usuario_id de la sesión
+        usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
+
+        # Marcar como reservados y asignar el usuario al asiento
+        disponibles.update(reservado=True, usuario_reservado=usuario)
+
+        return redirect('mis_reservas')
+
+    return render(request, 'asignar_asientos.html', {
+        'vuelo': vuelo,
+        'asientos': asientos,
+        'disponibles': disponibles  
+    })
 def vuelos_view(request):
     if not request.session.get('usuario_id'):
         return redirect('login')

@@ -5,11 +5,17 @@
     {% if reservas %}
         <ul class="list-group">
             {% for reserva in reservas %}
-                <li class="list-group-item">
-                    <strong>{{ reserva.vuelo.origen }} → {{ reserva.vuelo.destino }}</strong><br>
-                    Fecha de salida: {{ reserva.vuelo.fecha_salida }}<br>
-                    Reservado el: {{ reserva.fecha_reserva }}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ reserva.vuelo.origen }} → {{ reserva.vuelo.destino }}</strong><br>
+                        Fecha de salida: {{ reserva.vuelo.fecha_salida }}<br>
+                        Reservado el: {{ reserva.fecha_reserva }}
+                    </div>
+                    <a href="{% url 'asignar_asientos' reserva.id_vuelo.id_vuelo %}" class="btn btn-sm btn-outline-primary">
+    Asignar asientos
+</a>
                 </li>
+
             {% endfor %}
         </ul>
     {% else %}
