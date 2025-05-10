@@ -1,0 +1,46 @@
+.boton-reservar{
+    background: linear-gradient(45deg, #b52d00, #ff9f1a); 
+    border: none;
+    padding: 8px 16px; 
+    font-weight: bold;
+    border-radius: 8px;
+    color: white;
+    display: inline-block; /* Cambiado a inline-block para evitar que se estire */
+    font-size: 14px; /* Reducido el tamaño de la fuente */
+    transition: background 0.3s, transform 0.2s;
+    max-width: 150px; /* Añadí un máximo de ancho */
+    margin: 0 auto; /* Centra el botón */
+    margin-bottom: 20px; /* Espacio adicional al fondo */
+}
+
+.boton-reservar:hover {
+    background: linear-gradient(45deg, #a93226, #e67e22); 
+    transform: scale(1.05);
+}
+/* Alineación de los filtros */
+form .col-md-4, form .col-md-3 {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Alineación y tamaño del botón Filtrar */
+.boton-filtrar {
+    background: linear-gradient(45deg, #b52d00, #ff9f1a); 
+    border: none;
+    padding: 8px 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    transition: background 0.3s, transform 0.2s;
+    width: 100%;  /* 100% width to make the button fit the container */
+    max-width: 150px;
+    align-self: flex-start;  /* Align the button with the filters */
+    margin-top: 16px;  /* Add some margin at the top for separation */
+}
+
+.boton-filtrar:hover {
+    background: linear-gradient(45deg, #a93226, #e67e22); 
+    transform: scale(1.05);
+}

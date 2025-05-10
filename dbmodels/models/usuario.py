@@ -9,7 +9,7 @@ class Usuario(models.Model):
     estado = models.BooleanField(blank=True, null=True)
     confirmado = models.BooleanField(blank=True, null=True)
     token = models.TextField(blank=True, null=True)
-    fechatoken = models.DateTimeField(blank=True, null=True)  # ✅ Campo añadido
+    fechatoken = models.DateTimeField(blank=True, null=True) 
     id_rol = models.ForeignKey(Rol, models.DO_NOTHING, db_column='id_rol', blank=True, null=True)
 
     class Meta:

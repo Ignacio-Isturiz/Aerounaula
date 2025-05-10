@@ -1,0 +1,75 @@
+{% extends "usuarios/base.html" %}
+{% load humanize %}
+
+{% block title %}Vuelos disponibles - Aerounaula{% endblock %}
+
+    {% block content %}
+    <div class="container mt-5">
+        <h2 class="mb-4">Ofertas de viaje disponibles</h2>
+        {% if usuario_rol == "User" %}
+        <form method="get" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label for="origen">Origen</label>
+                <select class="form-select" name="origen" id="origen">
+                    <option value="">Todos</option>
+                    {% for ciudad in origenes %}
+                        <option value="{{ ciudad }}" {% if request.GET.origen == ciudad %}selected{% endif %}>{{ ciudad }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="destino">Destino</label>
+                <select class="form-select" name="destino" id="destino">
+                    <option value="">Todos</option>
+                    {% for ciudad in destinos %}
+                        <option value="{{ ciudad }}" {% if request.GET.destino == ciudad %}selected{% endif %}>{{ ciudad }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="fecha_salida">Fecha de salida</label>
+                <input type="date" class="form-control" name="fecha_salida" value="{{ request.GET.fecha_salida }}">
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn boton-filtrar">Filtrar</button>
+            </div>
+        </form>
+    {% endif %}
+        {% if usuario_rol == "Admin" %}
+        <a class="btn btn-primary mb-3" href="{% url 'crear_vuelo' %}">Crear nuevo vuelo</a>
+        {% endif %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {% for vuelo in vuelos %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ vuelo.imagen_url }}" class="card-img-top" alt="{{ vuelo.destino }}" style="height: 180px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ vuelo.destino }}</h5>
+                        <p class="card-text">Origen:
+                            {{ vuelo.origen }}
+                        </p>
+                        <p class="card-text">
+                            {{ vuelo.fecha_salida|date:"D d/m" }}
+                        </p>
+                        <p class="precio">desde ${{ vuelo.precio|floatformat:0|intcomma }}</p>
+
+                        {% if usuario_rol == "Admin" %}
+                        <a href="{% url 'editar_vuelo' vuelo.id_vuelo %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                        <form method="post" action="{% url 'eliminar_vuelo' vuelo.id_vuelo %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    <form method="post" action="{% url 'reservar_vuelo' vuelo.id_vuelo %}" class="text-center mt-2">
+                        {% csrf_token %}
+                        <button type="submit" class="boton-reservar">Reservar</button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center">No hay vuelos disponibles en este momento.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

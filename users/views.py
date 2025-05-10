@@ -4,13 +4,12 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.utils import timezone
 from django.conf import settings
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import make_password
 from django.template.loader import render_to_string
-from dbmodels.models.usuario import Usuario
+from dbmodels.models.usuario import Usuario, Rol
 from .forms import LoginForm, RegistroForm, RecuperarClaveForm, RestablecerClaveForm
 from django.utils.timezone import make_aware
 from django.http import HttpResponseRedirect
-from dbmodels.models.vuelos import Vuelos
 from django.contrib.auth import authenticate
 from axes.utils import reset 
 from axes.handlers.proxy import AxesProxyHandler
@@ -41,11 +40,22 @@ def login_view(request):
             usuario = authenticate(request, correo=correo, clave=clave)
 
             if usuario is not None:
-                reset(ip=request.META.get('REMOTE_ADDR'))
+                # Asegura que estás trabajando con un modelo actualizado
+                usuario_db = Usuario.objects.get(pk=usuario.id_usuario)
+                rol_nombre = None
+                if usuario_db.id_rol_id:  # <- accede al ID directamente si está definido
+                    try:
+                        rol = Rol.objects.get(id_rol=usuario_db.id_rol_id)
+                        rol_nombre = rol.nombrerol
+                    except Rol.DoesNotExist:
+                        rol_nombre = None
 
+                reset(ip=request.META.get('REMOTE_ADDR'))
 
                 request.session['usuario_id'] = usuario.id_usuario
                 request.session['usuario_nombre'] = usuario.nombre
+                request.session['usuario_rol'] = rol_nombre  
+
                 return redirect('dashboard')
             else:
                 messages.error(request, "Correo o contraseña incorrectos.")
@@ -211,17 +221,3 @@ def restablecer_clave(request, token):
         form = RestablecerClaveForm()
 
     return render(request, 'usuarios/restablecer_contraseña.html', {'form': form, 'titulo': 'Restablecer contraseña', 'ocultar_navbar': True})
-
-
-# ---------------------- VER VUELOS ----------------------
-def vuelos_view(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
-
-    vuelos = Vuelos.objects.filter(estado='Disponible')
-    context = {
-        'vuelos': vuelos,
-        'usuario_nombre': request.session.get('usuario_nombre'),
-        'ocultar_navbar': False
-    }
-    return render(request, 'usuarios/vuelos.html', context)
