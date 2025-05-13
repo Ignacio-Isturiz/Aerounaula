@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from dbmodels.models.vuelos import Vuelos
 from dbmodels.models.reserva import Reserva
 from django.utils import timezone
+from django.core.mail import send_mail
 from django.utils.dateparse import parse_datetime
 from dbmodels.models.asiento import Asiento 
 from dbmodels.models.usuario import Usuario
 from django.contrib import messages
-from datetime import datetime
 from django.utils.timezone import make_aware, now
 from django.views.decorators.http import require_POST
 
@@ -17,33 +17,69 @@ def asignar_asientos(request, id_vuelo):
     usuario_id = request.session['usuario_id']
     vuelo = get_object_or_404(Vuelos, pk=id_vuelo)
 
-    # Verifica que el vuelo le pertenece
     if not Reserva.objects.filter(id_usuario=usuario_id, id_vuelo=vuelo).exists():
         return redirect('mis_reservas')
 
-    # Asignamos la variable 'asientos' siempre, no solo en POST
     asientos = Asiento.objects.filter(vuelo=vuelo).order_by('asiento_numero')
-    
-    # Se asegura que 'disponibles' tenga un valor incluso en GET
+    usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
+
+    # Asientos actualmente asignados al usuario
+    asientos_usuario = asientos.filter(usuario_reservado=usuario)
     disponibles = asientos.filter(reservado=False)
 
     if request.method == 'POST':
-        seleccionados = request.POST.getlist('asientos')
-        disponibles = asientos.filter(id__in=seleccionados, reservado=False)
+        seleccionados_ids = list(map(int, request.POST.getlist('asientos')))
 
-        # Obtén el objeto Usuario desde la base de datos con el usuario_id de la sesión
-        usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
+        # Asientos que el usuario acaba de seleccionar
+        nuevos = asientos.filter(id__in=seleccionados_ids, reservado=False)
+        nuevos.update(reservado=True, usuario_reservado=usuario)
 
-        # Marcar como reservados y asignar el usuario al asiento
-        disponibles.update(reservado=True, usuario_reservado=usuario)
+        # Asientos que el usuario tenía pero quitó
+        desasignar = asientos_usuario.exclude(id__in=seleccionados_ids)
+        desasignar_ids = list(desasignar.values_list('asiento_numero', flat=True))
+        desasignar.update(reservado=False, usuario_reservado=None)
+
+        # Asientos actualmente asignados después de actualizar
+        nuevos_asientos = asientos.filter(id__in=seleccionados_ids, usuario_reservado=usuario)\
+                                  .values_list('asiento_numero', flat=True)
+
+        # Enviar correo si hay nuevos asientos
+        if nuevos_asientos:
+            send_mail(
+                subject='Asignación de asientos actualizada',
+                message=(
+                    f'Hola {usuario.nombre},\n\nTus asientos para el vuelo {vuelo.origen} → {vuelo.destino} '
+                    f'del {vuelo.fecha_salida.strftime("%d/%m/%Y %H:%M")} han sido actualizados.\n'
+                    f'Nuevos asientos: {", ".join(nuevos_asientos)}.\n\nGracias.'
+                ),
+                from_email=None,
+                recipient_list=[usuario.email],
+                fail_silently=False
+            )
+
+        # Enviar correo si hubo desasignaciones
+        if desasignar_ids:
+            send_mail(
+                subject='Cancelación de asientos',
+                message=(
+                    f'Hola {usuario.nombre},\n\nHas cancelado tu reserva de los siguientes asientos para el vuelo '
+                    f'{vuelo.origen} → {vuelo.destino} del {vuelo.fecha_salida.strftime("%d/%m/%Y %H:%M")}:\n'
+                    f'{", ".join(desasignar_ids)}.\n\nSi fue un error, puedes volver a asignarlos antes del vuelo.'
+                ),
+                from_email=None,
+                recipient_list=[usuario.email],
+                fail_silently=False
+            )
 
         return redirect('mis_reservas')
 
     return render(request, 'asignar_asientos.html', {
         'vuelo': vuelo,
         'asientos': asientos,
-        'disponibles': disponibles  
+        'disponibles': disponibles,
+        'asientos_usuario': asientos_usuario
     })
+
     
 def vuelos_view(request):
     if not request.session.get('usuario_id'):

@@ -4,32 +4,25 @@
     <h2>Asignar Asientos - Vuelo {{ vuelo.origen }} → {{ vuelo.destino }}</h2>
 
     <form method="post">
-        {% csrf_token %}
-        
-        <h4>Selecciona tus asientos:</h4>
-        <div class="row">
-            {% for asiento in asientos %}
-                <div class="col-md-2 mb-2">
-                    {% if asiento.reservado %}
-                        <button class="btn btn-secondary" disabled>
-                            {{ asiento.asiento_numero }}
-                        </button>
-                    {% else %}
-                        <label>
-                            <input type="checkbox" name="asientos" value="{{ asiento.id }}">
-                            <button class="btn btn-success">
-                                {{ asiento.asiento_numero }}
-                            </button>
-                        </label>
+    {% csrf_token %}
+    <h4>Selecciona tus asientos:</h4>
+    <div class="asientos">
+        {% for asiento in asientos %}
+            <label>
+                <input type="checkbox" name="asientos" value="{{ asiento.id }}"
+                    {% if asiento.usuario_reservado.id_usuario == request.session.usuario_id %}
+                        checked
                     {% endif %}
-                </div>
-            {% endfor %}
+                    {% if asiento.reservado and asiento.usuario_reservado.id_usuario != request.session.usuario_id %}
+                        disabled
+                    {% endif %}
+                >
+                Asiento {{ asiento.asiento_numero }}
+            </label><br>
+        {% endfor %}
+    </div>
+    <button type="submit">Guardar cambios</button>
+</form>
 
-        </div>
-
-        <div class="mt-3">
-            <button type="submit" class="btn btn-primary">Confirmar selección</button>
-        </div>
-    </form>
 </div>
 {% endblock %}
