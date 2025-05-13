@@ -2,8 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from dbmodels.models.vuelos import Vuelos
 from dbmodels.models.reserva import Reserva
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from dbmodels.models.asiento import Asiento 
-from dbmodels.models.usuario import Usuario  # Asegúrate de importar el modelo Usuario
+from dbmodels.models.usuario import Usuario
+from django.contrib import messages
+from datetime import datetime
+from django.utils.timezone import make_aware, now
+from django.views.decorators.http import require_POST
 
 def asignar_asientos(request, id_vuelo):
     if not request.session.get('usuario_id'):
@@ -39,6 +44,7 @@ def asignar_asientos(request, id_vuelo):
         'asientos': asientos,
         'disponibles': disponibles  
     })
+    
 def vuelos_view(request):
     if not request.session.get('usuario_id'):
         return redirect('login')
@@ -101,31 +107,77 @@ def mis_reservas(request):
         'ocultar_navbar': False
     }
     return render(request, 'mis_reservas.html', context)
+
+@require_POST
+def cancelar_reserva(request, id_reserva):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+
+    usuario_id = request.session['usuario_id']
+    reserva = get_object_or_404(Reserva, pk=id_reserva, id_usuario=usuario_id)
+
+    reserva.delete()
+    messages.success(request, "La reserva fue cancelada correctamente.")
+    return redirect('mis_reservas')
+
+
 def crear_vuelo(request):
     if request.method == 'POST':
+        fecha_salida_str = request.POST['fecha_salida']
+        fecha_salida = parse_datetime(fecha_salida_str)
+
+        if fecha_salida is None:
+            messages.error(request, "Formato de fecha inválido.")
+            return redirect('vuelos')
+
+        if timezone.is_naive(fecha_salida):
+            fecha_salida = make_aware(fecha_salida)
+
+        if fecha_salida < now():
+            messages.error(request, "No puedes crear un vuelo con una fecha pasada.")
+            return redirect('vuelos')
+
         Vuelos.objects.create(
             origen=request.POST['origen'],
             destino=request.POST['destino'],
-            fecha_salida=request.POST['fecha_salida'],
+            fecha_salida=fecha_salida,
             precio=request.POST['precio'],
             estado=request.POST.get('estado', ''),
             imagen_url=request.POST.get('imagen_url', '')
         )
         return redirect('vuelos')
+
     return render(request, 'crear.html', {'vuelo': None})
 
 def editar_vuelo(request, id_vuelo):
     vuelo = get_object_or_404(Vuelos, pk=id_vuelo)
+
     if request.method == 'POST':
+        fecha_salida_str = request.POST['fecha_salida']
+        fecha_salida = parse_datetime(fecha_salida_str)
+
+        if fecha_salida is None:
+            messages.error(request, "Formato de fecha inválido.")
+            return redirect('vuelos')
+
+        if timezone.is_naive(fecha_salida):
+            fecha_salida = make_aware(fecha_salida)
+
+        if fecha_salida < now():
+            messages.error(request, "No puedes establecer una fecha pasada para este vuelo.")
+            return redirect('vuelos')
+
         vuelo.origen = request.POST['origen']
         vuelo.destino = request.POST['destino']
-        vuelo.fecha_salida = request.POST['fecha_salida']
+        vuelo.fecha_salida = fecha_salida
         vuelo.precio = request.POST['precio']
         vuelo.estado = request.POST.get('estado', '')
         vuelo.imagen_url = request.POST.get('imagen_url', '')
         vuelo.save()
         return redirect('vuelos')
+
     return render(request, 'crear.html', {'vuelo': vuelo})
+
 
 def eliminar_vuelo(request, id_vuelo):
     vuelo = get_object_or_404(Vuelos, pk=id_vuelo)

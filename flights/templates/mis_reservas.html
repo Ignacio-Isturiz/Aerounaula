@@ -2,20 +2,35 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Tus Reservas</h2>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
     {% if reservas %}
         <ul class="list-group">
             {% for reserva in reservas %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
                         <strong>{{ reserva.vuelo.origen }} → {{ reserva.vuelo.destino }}</strong><br>
-                        Fecha de salida: {{ reserva.vuelo.fecha_salida }}<br>
-                        Reservado el: {{ reserva.fecha_reserva }}
+                        Fecha de salida: {{ reserva.id_vuelo.fecha_salida }}<br>
+                        Reservado el: {{ reserva.fecha_reserva|date:"d/m/Y H:i" }}
                     </div>
-                    <a href="{% url 'asignar_asientos' reserva.id_vuelo.id_vuelo %}" class="btn btn-sm btn-outline-primary">
-    Asignar asientos
-</a>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'asignar_asientos' reserva.id_vuelo.id_vuelo %}" class="btn btn-sm btn-outline-primary">
+                            Asignar asientos
+                        </a>
+                        <form method="post" action="{% url 'cancelar_reserva' reserva.id_reserva %}" onsubmit="return confirm('¿Estás seguro de cancelar esta reserva?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancelar</button>
+                        </form>
+                    </div>
                 </li>
-
             {% endfor %}
         </ul>
     {% else %}

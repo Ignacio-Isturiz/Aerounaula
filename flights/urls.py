@@ -9,6 +9,6 @@ urlpatterns = [
     path('reservar/<int:id_vuelo>/', views.reservar_vuelo, name='reservar_vuelo'),
     path('mis-reservas/', views.mis_reservas, name='mis_reservas'),
     path('asientos/<int:id_vuelo>/', views.asignar_asientos, name='asignar_asientos'),
-
+    path('reservas/cancelar/<int:id_reserva>/', views.cancelar_reserva, name='cancelar_reserva'),
 
 ]

@@ -2,10 +2,24 @@
 
 <form method="post">
   {% csrf_token %}
-  <label>Origen:</label><input type="text" name="origen" value="{{ vuelo.origen|default:'' }}"><br>
-  <label>Destino:</label><input type="text" name="destino" value="{{ vuelo.destino|default:'' }}"><br>
-  <label>Fecha de salida:</label><input type="datetime-local" name="fecha_salida" value="{{ vuelo.fecha_salida|date:'Y-m-d\\TH:i' }}"><br>
-  <label>Estado:</label><input type="text" name="estado" value="{{ vuelo.estado|default:'' }}"><br>
-  <label>Imagen URL:</label><input type="text" name="imagen_url" value="{{ vuelo.imagen_url|default:'' }}"><br>
+  
+  <label>Origen:</label>
+  <input type="text" name="origen" value="{{ vuelo.origen|default:'' }}"><br>
+
+  <label>Destino:</label>
+  <input type="text" name="destino" value="{{ vuelo.destino|default:'' }}"><br>
+
+  <label>Fecha de salida:</label>
+  <input type="datetime-local" name="fecha_salida" value="{{ vuelo.fecha_salida|date:'Y-m-d\\TH:i' }}"><br>
+
+  <label>Precio:</label>
+  <input type="number" step="0.01" name="precio" value="{{ vuelo.precio|default:'' }}"><br>
+
+  <label>Estado:</label>
+  <input type="text" name="estado" value="{{ vuelo.estado|default:'' }}"><br>
+
+  <label>Imagen URL:</label>
+  <input type="text" name="imagen_url" value="{{ vuelo.imagen_url|default:'' }}"><br>
+
   <button type="submit">Guardar</button>
 </form>
