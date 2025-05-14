@@ -1,0 +1,22 @@
+{% extends "usuarios/base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Cambiar contraseña</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Contraseña actual</label>
+            <input type="password" name="clave_actual" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Nueva contraseña</label>
+            <input type="password" name="nueva_clave" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Confirmar nueva contraseña</label>
+            <input type="password" name="confirmar_clave" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "usuarios/base.html" %}
+{% block content %}
+<h2>Mis Asientos Reservados</h2>
+
+{% if asientos %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Vuelo</th>
+            <th>Ruta</th>
+            <th>Fecha</th>
+            <th>Asiento</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for asiento in asientos %}
+        <tr>
+            <td>{{ asiento.codigo.codigo }}</td>
+            <td>{{ asiento.codigo.origen }} → {{ asiento.codigo.destino }}</td>
+            <td>{{ asiento.codigo.fecha_salida|date:"d/m/Y H:i" }}</td>
+            <td>{{ asiento.asiento_numero }}</td>
+            <td>
+                <form method="post" action="{% url 'cancelar_asiento' asiento.id %}" onsubmit="return confirm('¿Estás seguro de cancelar este asiento?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No tienes asientos reservados actualmente.</p>
+{% endif %}
+
+{% endblock %}

@@ -1,28 +1,36 @@
 {% extends "usuarios/base.html" %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Asignar Asientos - Vuelo {{ vuelo.origen }} → {{ vuelo.destino }}</h2>
 
-    <form method="post">
+<h2>Asignar Asientos</h2>
+<form method="post">
     {% csrf_token %}
-    <h4>Selecciona tus asientos:</h4>
-    <div class="asientos">
-        {% for asiento in asientos %}
-            <label>
-                <input type="checkbox" name="asientos" value="{{ asiento.id }}"
-                    {% if asiento.usuario_reservado.id_usuario == request.session.usuario_id %}
-                        checked
-                    {% endif %}
-                    {% if asiento.reservado and asiento.usuario_reservado.id_usuario != request.session.usuario_id %}
-                        disabled
-                    {% endif %}
-                >
-                Asiento {{ asiento.asiento_numero }}
-            </label><br>
-        {% endfor %}
-    </div>
-    <button type="submit">Guardar cambios</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Seleccionar</th>
+                <th>Asiento</th>
+                <th>Tipo de pasajero</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asiento in disponibles %}
+            <tr>
+                <td>
+                    <input type="checkbox" name="asientos" value="{{ asiento.id }}" id="asiento_{{ asiento.id }}">
+                </td>
+                <td>{{ asiento.asiento_numero }}</td>
+                <td>
+                    <select name="tipo_pasajero_{{ asiento.id }}" class="form-control">
+                        <option value="adulto">Adulto</option>
+                        <option value="nino">Niño</option>
+                        <option value="persona_mayor">Persona Mayor</option>
+                    </select>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Calcular y Confirmar</button>
 </form>
 
-</div>
 {% endblock %}

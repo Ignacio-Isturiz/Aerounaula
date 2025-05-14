@@ -1,0 +1,35 @@
+{% extends "usuarios/base.html" %}
+{% block content %}
+<h2>Confirmar Asientos</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Asiento</th>
+            <th>Tipo de pasajero</th>
+            <th>Precio</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in resumen_asientos %}
+        <tr>
+            <td>{{ item.asiento }}</td>
+            <td>
+                {% if item.tipo_pasajero == 'nino' %}Niño
+                {% elif item.tipo_pasajero == 'persona_mayor' %}Persona Mayor
+                {% else %}Adulto{% endif %}
+            </td>
+            <td>${{ item.precio|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success">Confirmar Reserva</button>
+    <a href="{% url 'asignar_asientos' vuelo.codigo %}" class="btn btn-secondary">Modificar Selección</a>
+</form>
+<a href="{% url 'descargar_tiquetes' %}" class="btn btn-primary">Descargar Tiquetes en PDF</a>
+
+{% endblock %}

@@ -12,3 +12,4 @@ class Asiento(models.Model):
     class Meta:
         managed = False
         db_table = 'asientos'
+        unique_together = ('codigo', 'asiento_numero')

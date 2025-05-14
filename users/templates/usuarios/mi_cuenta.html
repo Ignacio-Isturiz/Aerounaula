@@ -1,0 +1,22 @@
+{% extends "usuarios/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Mi cuenta</h2>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ usuario.nombre }}</h5>
+            <p class="card-text"><strong>Correo:</strong> {{ usuario.correo }}</p>
+            
+        </div>
+    </div>
+
+    <div class="list-group">
+        <a href="{% url 'mis_reservas' %}" class="list-group-item list-group-item-action">Mis reservas</a>
+        <a href="{% url 'mis_asientos' %}" class="list-group-item list-group-item-action">Mis asientos</a>  {# Puedes filtrar o ajustar dinámicamente #}
+        <a href="{% url 'cambiar_contraseña' %}" class="list-group-item list-group-item-action">Cambiar contraseña</a>
+        <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">Cerrar sesión</a>
+    </div>
+</div>
+{% endblock %}
