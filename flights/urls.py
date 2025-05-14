@@ -14,5 +14,6 @@ urlpatterns = [
     path('mis-asientos/', views.mis_asientos, name='mis_asientos'),
     path('asiento/cancelar/<int:asiento_id>/', views.cancelar_asiento, name='cancelar_asiento'),
     path('descargar-tiquetes/', views.descargar_tiquetes_pdf, name='descargar_tiquetes'),
-    
+    path('info/equipaje/', views.info_equipaje, name='info_equipaje'),
+
 ]

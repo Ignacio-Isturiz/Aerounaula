@@ -361,3 +361,8 @@ def confirmar_asientos(request):
 
     messages.success(request, "Tus asientos han sido reservados correctamente.")
     return redirect('mis_asientos')
+
+def info_equipaje(request):
+    return render(request, 'informacion/equipaje.html')
+
+

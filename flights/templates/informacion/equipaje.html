@@ -1,0 +1,40 @@
+{% extends "usuarios/base.html" %}
+
+{% block title %}Prepara tu equipaje{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-3">Prepara tu equipaje</h2>
+    <p class="text-center mb-5">Viaja a tu medida con el equipaje que necesitas</p>
+
+    <!-- Artículo personal -->
+    <div class="bg-white shadow-sm rounded p-4 mb-4">
+        <h5>Artículo personal</h5>
+        <p>Puede ser una cartera, morral, pañalera, un bolso para llevar un portátil o un paquete.</p>
+        <ul>
+            <li><strong>Medidas máximas:</strong> 45 x 35 x 20 cm (alto, largo y ancho).</li>
+            <li>Asegúrate que puedas ubicarlo debajo del asiento delantero.</li>
+        </ul>
+    </div>
+
+    <!-- Equipaje de mano -->
+    <div class="bg-white shadow-sm rounded p-4 mb-4">
+        <h5>Equipaje de mano</h5>
+        <p>Puedes llevarlo contigo en la cabina del avión y ubicarlo en el compartimiento superior.</p>
+        <ul>
+            <li><strong>Medidas máximas:</strong> 55 x 35 x 25 cm (alto, largo y ancho), incluyendo ruedas y manijas.</li>
+            <li><strong>Peso máximo:</strong> 10 kg. Si no cumple, se registra como equipaje de bodega.</li>
+        </ul>
+    </div>
+
+    <!-- Equipaje de bodega -->
+    <div class="bg-white shadow-sm rounded p-4 mb-4">
+        <h5>Equipaje de bodega</h5>
+        <p>Regístralo en el counter del aeropuerto antes de ir a la sala de abordaje.</p>
+        <ul>
+            <li><strong>Medidas máximas:</strong> no debe exceder los 158 cm (62") lineales.</li>
+            <li><strong>Peso máximo:</strong> 23 kg en Clase económica y 32 kg en Business Class.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
