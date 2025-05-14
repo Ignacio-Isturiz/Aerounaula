@@ -4,7 +4,6 @@
 
 {% block title %}Vuelos disponibles - Aerounaula{% endblock %}
 
-
 {% block content %}
 <div class="container mt-5">
     <h2 class="mb-4">Ofertas de viaje disponibles</h2>
@@ -41,6 +40,12 @@
             <label for="fecha_salida">Fecha de salida</label>
             <input type="date" name="fecha_salida" id="fecha_salida" class="form-control" min="">
         </div>
+        {% if usuario_rol %}
+        <div class="col-md-12">
+            <label for="codigo">Código de vuelo:</label>
+            <input type="text" id="codigo" name="codigo" value="{{ request.GET.codigo }}" class="form-control">
+        </div>
+        {% endif %}
         <div class="col-md-1 d-flex align-items-end">
             <button type="submit" class="btn boton-filtrar">Filtrar</button>
         </div>
@@ -52,7 +57,7 @@
     </form>
     {% endif %}
 
-    {% if usuario_rol == "Admin" %}
+     {% if usuario_rol == "Admin" %}
     <button class="btn btn-primary mb-3" onclick="abrirModalCrear()">Crear nuevo vuelo</button>
     {% endif %}
 
@@ -68,9 +73,9 @@
                     <p class="precio">desde ${{ vuelo.precio|floatformat:0|intcomma }}</p>
 
                     {% if usuario_rol == "Admin" %}
-                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                   <button type="button" class="btn btn-sm btn-outline-secondary"
                         onclick="abrirModalEditar(this)"
-                        data-id="{{ vuelo.id_vuelo }}"
+                        data-id="{{ vuelo.codigo }}"
                         data-origen="{{ vuelo.origen|escapejs }}"
                         data-destino="{{ vuelo.destino|escapejs }}"
                         data-fecha="{{ vuelo.fecha_salida|date:'Y-m-d\\TH:i' }}"
@@ -80,7 +85,7 @@
                         Editar
                     </button>
 
-                    <form method="post" action="{% url 'eliminar_vuelo' vuelo.id_vuelo %}" style="display:inline;">
+                    <form method="post" action="{% url 'eliminar_vuelo' vuelo.codigo %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                     </form>
@@ -88,7 +93,7 @@
                 </div>
 
                 {% if usuario_rol == "User" %}
-                <form method="post" action="{% url 'reservar_vuelo' vuelo.id_vuelo %}" class="text-center mt-2">
+                <form method="post" action="{% url 'reservar_vuelo' vuelo.codigo %}" class="text-center mt-2">
                     {% csrf_token %}
                     <button type="submit" class="boton-reservar">Reservar</button>
                 </form>
@@ -112,7 +117,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          <input type="hidden" name="id_vuelo" id="id_vuelo">
+          <input type="hidden" name="codigo" id="codigo">
           <label>Origen:</label>
           <input type="text" name="origen" id="origen" class="form-control">
 
@@ -120,7 +125,7 @@
           <input type="text" name="destino" id="destino" class="form-control">
 
           <label>Fecha de salida:</label>
-          <input type="datetime-local" name="fecha_salida" id="fecha_salida" class="form-control">
+          <input type="date" name="fecha_salida" id="fecha_salida" class="form-control">
 
           <label>Precio:</label>
           <input type="number" step="0.01" name="precio" id="precio" class="form-control">
@@ -140,7 +145,7 @@
   </div>
 </div>
 
-<!-- BOOTSTRAP + SCRIPT JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'js/vuelos.js' %}"></script>
 {% endblock %}
+

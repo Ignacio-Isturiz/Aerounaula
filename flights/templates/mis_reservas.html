@@ -18,13 +18,14 @@
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
                         <strong>{{ reserva.vuelo.origen }} → {{ reserva.vuelo.destino }}</strong><br>
-                        Fecha de salida: {{ reserva.id_vuelo.fecha_salida }}<br>
+                        Fecha de salida: {{ reserva.vuelo.fecha_salida }}<br>
                         Reservado el: {{ reserva.fecha_reserva|date:"d/m/Y H:i" }}
                     </div>
                     <div class="d-flex gap-2">
-                        <a href="{% url 'asignar_asientos' reserva.id_vuelo.id_vuelo %}" class="btn btn-sm btn-outline-primary">
+                        <a href="{% url 'asignar_asientos' reserva.vuelo.codigo %}" class="btn btn-sm btn-outline-primary">
                             Asignar asientos
                         </a>
+                    
                         <form method="post" action="{% url 'cancelar_reserva' reserva.id_reserva %}" onsubmit="return confirm('¿Estás seguro de cancelar esta reserva?');">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-outline-danger">Cancelar</button>
