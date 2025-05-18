@@ -35,20 +35,12 @@ def login_view(request):
                     'titulo': 'Inicio de sesión',
                     'ocultar_navbar': False
                 })
-
-
+            
             usuario = authenticate(request, correo=correo, clave=clave)
-
             if usuario is not None:
                 # Asegura que estás trabajando con un modelo actualizado
                 usuario_db = Usuario.objects.get(pk=usuario.id_usuario)
-                rol_nombre = None
-                if usuario_db.id_rol_id:  # <- accede al ID directamente si está definido
-                    try:
-                        rol = Rol.objects.get(id_rol=usuario_db.id_rol_id)
-                        rol_nombre = rol.nombrerol
-                    except Rol.DoesNotExist:
-                        rol_nombre = None
+                rol_nombre = usuario_db.id_rol.nombrerol if usuario_db.id_rol else None
 
                 reset(ip=request.META.get('REMOTE_ADDR'))
 
@@ -56,7 +48,10 @@ def login_view(request):
                 request.session['usuario_nombre'] = usuario.nombre
                 request.session['usuario_rol'] = rol_nombre  
 
-                return redirect('dashboard')
+                if rol_nombre and rol_nombre.lower() == 'admin':
+                    return redirect('panel_admin') 
+                else:
+                    return redirect('dashboard')
             else:
                 messages.error(request, "Correo o contraseña incorrectos.")
         else:
