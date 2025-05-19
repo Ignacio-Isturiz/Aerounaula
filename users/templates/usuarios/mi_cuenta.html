@@ -1,22 +1,111 @@
 {% extends "usuarios/base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Mi cuenta</h2>
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="fw-bold py-3 mb-4">
+    <span class="text-muted fw-light">Cuenta /</span> Mi Perfil
+  </h4>
 
-    <div class="card mb-3">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card mb-4">
+        <h5 class="card-header">Detalles del Perfil</h5>
         <div class="card-body">
-            <h5 class="card-title">{{ usuario.nombre }}</h5>
-            <p class="card-text"><strong>Correo:</strong> {{ usuario.correo }}</p>
-            
+          <div class="d-flex align-items-start align-items-sm-center gap-4">
+            <img
+              src="{% static 'sneat/assets/img/avatars/1.png' %}"
+              alt="user-avatar"
+              class="d-block rounded"
+              height="100"
+              width="100"
+            />
+            <div class="flex-grow-1">
+              <span class="fw-semibold d-block">{{ usuario.nombre }}</span>
+              <small class="text-muted">Usuario</small>
+            </div>
+          </div>
         </div>
+        <hr class="my-0" />
+        <div class="card-body">
+          <div class="row">
+            <div class="mb-3 col-md-6">
+              <label class="form-label">Nombre Completo</label>
+              <input class="form-control" type="text" value="{{ usuario.nombre }}" readonly>
+            </div>
+            <div class="mb-3 col-md-6">
+              <label class="form-label">Correo Electrónico</label>
+              <input class="form-control" type="text" value="{{ usuario.correo }}" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Opciones y zona peligrosa alineadas -->
+  <div class="row d-flex align-items-stretch">
+    <!-- Opciones -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <h5 class="card-header">Opciones</h5>
+        <div class="list-group list-group-flush">
+          <a href="{% url 'mis_reservas' %}" class="list-group-item list-group-item-action">Mis reservas</a>
+          <a href="{% url 'mis_asientos' %}" class="list-group-item list-group-item-action">Mis asientos</a>
+          <a href="{% url 'cambiar_contraseña' %}" class="list-group-item list-group-item-action">Cambiar contraseña</a>
+          <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">Cerrar sesión</a>
+        </div>
+      </div>
     </div>
 
-    <div class="list-group">
-        <a href="{% url 'mis_reservas' %}" class="list-group-item list-group-item-action">Mis reservas</a>
-        <a href="{% url 'mis_asientos' %}" class="list-group-item list-group-item-action">Mis asientos</a>  {# Puedes filtrar o ajustar dinámicamente #}
-        <a href="{% url 'cambiar_contraseña' %}" class="list-group-item list-group-item-action">Cambiar contraseña</a>
-        <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">Cerrar sesión</a>
+    <!-- Zona peligrosa -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100 border-danger">
+        <h5 class="card-header bg-danger text-white">Zona Peligrosa</h5>
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title text-danger">Eliminar Cuenta Permanentemente</h5>
+            <p class="card-text">
+              Esta acción eliminará todos tus datos y no podrá deshacerse.
+            </p>
+          </div>
+          <div>
+            <button 
+              type="button" 
+              class="btn btn-danger mt-3" 
+              data-bs-toggle="modal" 
+              data-bs-target="#confirmDeleteModal"
+            >
+              <i class="bx bx-trash me-2"></i> Eliminar mi cuenta
+            </button>
+          </div>
+
+          <!-- Modal de confirmación -->
+          <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title text-danger">¿Estás seguro?</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                  <p>¿Realmente deseas eliminar tu cuenta?</p>
+                  <p class="text-danger"><strong>Esta acción no se puede deshacer.</strong></p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <form method="POST" action="{% url 'mi_cuenta' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="delete_account" class="btn btn-danger">Sí, Eliminar</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /Modal -->
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

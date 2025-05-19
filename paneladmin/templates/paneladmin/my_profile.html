@@ -1,0 +1,107 @@
+{% extends 'paneladmin/panel.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="fw-bold py-3 mb-4">
+    <span class="text-muted fw-light">Cuenta /</span> Mi Perfil
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <!-- Detalles del Perfil -->
+      <div class="card mb-4">
+        <h5 class="card-header">Detalles del Perfil</h5>
+        <div class="card-body">
+          <div class="d-flex align-items-start align-items-sm-center gap-4">
+            <img
+              src="{% static 'sneat/assets/img/avatars/1.png' %}"
+              alt="user-avatar"
+              class="d-block rounded"
+              height="100"
+              width="100"
+            />
+            <div class="flex-grow-1">
+              <span class="fw-semibold d-block">{{ usuario_nombre }}</span>
+              <small class="text-muted">{{ usuario_rol }}</small>
+            </div>
+          </div>
+        </div>
+        <hr class="my-0">
+        <div class="card-body">
+          <div class="row">
+            <div class="mb-3 col-md-6">
+              <label class="form-label">Nombre Completo</label>
+              <input class="form-control" type="text" value="{{ usuario.nombre }}" readonly>
+            </div>
+            <div class="mb-3 col-md-6">
+              <label class="form-label">Correo</label>
+              <input class="form-control" type="text" value="{{ usuario.correo }}" readonly>
+            </div>
+            <div class="mb-3 col-md-6">
+              <label class="form-label">Rol</label>
+              <input class="form-control" type="text" value="{{ usuario_rol }}" readonly>
+            </div>
+            <div class="mb-3 col-md-6">
+              <label class="form-label">Estado</label>
+              <input class="form-control" type="text" 
+                     value="{% if usuario.estado %}Activo{% else %}Inactivo{% endif %}" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zona Peligrosa -->
+      <div class="card">
+        <h5 class="card-header text-danger">Zona Peligrosa</h5>
+        <div class="card-body">
+          <h5 class="card-title text-danger">Eliminar Cuenta Permanentemente</h5>
+          <p class="card-text">
+            Al eliminar tu cuenta, se perderán todos tus datos y no podrás recuperarlos.
+            Esta acción no se puede deshacer.
+          </p>
+
+          <!-- Botón para abrir modal -->
+          <button 
+            type="button" 
+            class="btn btn-danger" 
+            data-bs-toggle="modal" 
+            data-bs-target="#confirmDeleteModal"
+          >
+            <i class="bx bx-trash me-2"></i> Eliminar Mi Cuenta
+          </button>
+
+          <!-- Modal de Confirmación -->
+          <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title text-danger">Confirmar Eliminación</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <p>¿Estás absolutamente seguro de que deseas eliminar tu cuenta?</p>
+                  <p class="text-danger"><strong>Esta acción no se puede deshacer.</strong></p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                  </button>
+                  <form method="POST" action="{% url 'my_profile' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="delete_account" class="btn btn-danger">
+                      Sí, Eliminar Definitivamente
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /Modal -->
+        </div>
+      </div>
+      <!-- /Zona Peligrosa -->
+    </div>
+  </div>
+</div>
+{% endblock %}

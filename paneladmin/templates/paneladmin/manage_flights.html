@@ -1,0 +1,292 @@
+{% extends 'paneladmin/panel.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="fw-bold py-3 mb-4">
+    <span class="text-muted fw-light">Administración /</span> Gestión de Vuelos
+  </h4>
+
+  <!-- Card de Tabla de Vuelos -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5>Listado de Vuelos</h5>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createFlightModal">
+        <i class="bx bx-plus me-2"></i>Nuevo Vuelo
+      </button>
+    </div>
+    <div class="table-responsive text-nowrap">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Imagen</th>
+            <th>Origen</th>
+            <th>Destino</th>
+            <th>Fecha Salida</th>
+            <th>Precio</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+          {% for vuelo in vuelos %}
+          <tr>
+            <td><strong>{{ vuelo.codigo }}</strong></td>
+                <td>
+                {% if vuelo.imagen_url %}
+                <img src="{{ vuelo.imagen_url }}"
+                    alt="Imagen vuelo"
+                    class="rounded"
+                    width="49"
+                    height="49"
+                {% else %}
+                <img src="{% static 'sneat/assets/img/icons/unicons/plane.png' %}"
+                    alt="Imagen por defecto"
+                    class="rounded"
+                    width="49"
+                    height="49">
+                {% endif %}
+                </td>
+            <td>{{ vuelo.origen }}</td>
+            <td>{{ vuelo.destino }}</td>
+            <td>{{ vuelo.fecha_salida|date:"d/m/Y H:i" }}</td>
+            <td>${{ vuelo.precio }}</td>
+            <td>
+              {% if vuelo.estado == 'Disponible' %}
+                <span class="badge bg-label-success">Disponible</span>
+              {% elif vuelo.estado == 'Cancelado' %}
+                <span class="badge bg-label-danger">Cancelado</span>
+              {% else %}
+                <span class="badge bg-label-warning">{{ vuelo.estado }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="dropdown">
+                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                  <i class="bx bx-dots-vertical-rounded"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="javascript:void(0);" 
+                     data-bs-toggle="modal" data-bs-target="#editFlightModal{{ vuelo.codigo }}">
+                    <i class="bx bx-edit-alt me-2"></i> Editar
+                  </a>
+                  <a class="dropdown-item" href="javascript:void(0);" 
+                     data-bs-toggle="modal" data-bs-target="#deleteFlightModal{{ vuelo.codigo }}">
+                    <i class="bx bx-trash me-2"></i> Eliminar
+                  </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal para Crear Vuelo -->
+  <div class="modal fade" id="createFlightModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Crear Nuevo Vuelo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST" action="{% url 'create_flight' %}">
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="codigo" class="form-label">Código de Vuelo</label>
+                <input type="text" id="codigo" name="codigo" class="form-control" required 
+                       pattern="[A-Za-z0-9]{6}" title="6 caracteres alfanuméricos">
+              </div>
+              <div class="col-md-6">
+                <label for="estado" class="form-label">Estado</label>
+                <select id="estado" name="estado" class="form-select" required>
+                  <option value="Disponible" selected>Disponible</option>
+                  <option value="Cancelado">Cancelado</option>
+                  <option value="Completo">Completo</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="origen" class="form-label">Origen</label>
+                <input type="text" id="origen" name="origen" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label for="destino" class="form-label">Destino</label>
+                <input type="text" id="destino" name="destino" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label for="fecha_salida" class="form-label">Fecha y Hora de Salida</label>
+                <input type="datetime-local" id="fecha_salida" name="fecha_salida" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label for="precio" class="form-label">Precio ($)</label>
+                <input type="number" id="precio" name="precio" class="form-control" step="0.01" min="0" required>
+              </div>
+              <div class="col-12">
+                <label for="imagen_url" class="form-label">URL de Imagen</label>
+                <input type="url" id="imagen_url" name="imagen_url" class="form-control" 
+                       placeholder="https://ejemplo.com/imagen.jpg">
+                <div class="form-text">Opcional. URL completa de la imagen del vuelo.</div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="previewImage" onclick="previewImage()">
+                  <label class="form-check-label" for="previewImage">Previsualizar imagen</label>
+                </div>
+                <div id="imagePreviewContainer" class="mt-2 text-center d-none">
+                  <img id="imagePreview" src="" alt="Previsualización" class="img-thumbnail" style="max-height: 150px;">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Vuelo</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modales para Editar/Eliminar (uno por vuelo) -->
+  {% for vuelo in vuelos %}
+  <!-- Modal Editar Vuelo -->
+  <div class="modal fade" id="editFlightModal{{ vuelo.codigo }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Vuelo {{ vuelo.codigo }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST" action="{% url 'edit_flight' vuelo.codigo %}">
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="codigo{{ vuelo.codigo }}" class="form-label">Código</label>
+                <input type="text" id="codigo{{ vuelo.codigo }}" class="form-control" 
+                       value="{{ vuelo.codigo }}" readonly>
+              </div>
+              <div class="col-md-6">
+                <label for="estado{{ vuelo.codigo }}" class="form-label">Estado</label>
+                <select id="estado{{ vuelo.codigo }}" name="estado" class="form-select" required>
+                  <option value="Disponible" {% if vuelo.estado == 'Disponible' %}selected{% endif %}>Disponible</option>
+                  <option value="Cancelado" {% if vuelo.estado == 'Cancelado' %}selected{% endif %}>Cancelado</option>
+                  <option value="Completo" {% if vuelo.estado == 'Completo' %}selected{% endif %}>Completo</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="origen{{ vuelo.codigo }}" class="form-label">Origen</label>
+                <input type="text" id="origen{{ vuelo.codigo }}" name="origen" 
+                       class="form-control" value="{{ vuelo.origen }}" required>
+              </div>
+              <div class="col-md-6">
+                <label for="destino{{ vuelo.codigo }}" class="form-label">Destino</label>
+                <input type="text" id="destino{{ vuelo.codigo }}" name="destino" 
+                       class="form-control" value="{{ vuelo.destino }}" required>
+              </div>
+              <div class="col-md-6">
+                <label for="fecha_salida{{ vuelo.codigo }}" class="form-label">Fecha Salida</label>
+                <input type="datetime-local" id="fecha_salida{{ vuelo.codigo }}" name="fecha_salida" 
+                       class="form-control" value="{{ vuelo.fecha_salida|date:'Y-m-d\TH:i' }}" required>
+              </div>
+              <div class="col-md-6">
+                <label for="precio{{ vuelo.codigo }}" class="form-label">Precio ($)</label>
+                <input type="number" id="precio{{ vuelo.codigo }}" name="precio" 
+                       class="form-control" value="{{ vuelo.precio }}" step="0.01" min="0" required>
+              </div>
+              <div class="col-12">
+                <label for="imagen_url{{ vuelo.codigo }}" class="form-label">URL de Imagen</label>
+                <input type="url" id="imagen_url{{ vuelo.codigo }}" name="imagen_url" 
+                       class="form-control" value="{{ vuelo.imagen_url|default:'' }}">
+                <div class="form-text">Opcional. URL completa de la imagen del vuelo.</div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="previewImage{{ vuelo.codigo }}" 
+                         onclick="previewImage('{{ vuelo.codigo }}')">
+                  <label class="form-check-label" for="previewImage{{ vuelo.codigo }}">Previsualizar imagen</label>
+                </div>
+                <div id="imagePreviewContainer{{ vuelo.codigo }}" class="mt-2 text-center {% if not vuelo.imagen_url %}d-none{% endif %}">
+                  {% if vuelo.imagen_url %}
+                  <img id="imagePreview{{ vuelo.codigo }}" src="{{ vuelo.imagen_url }}" 
+                       alt="Previsualización" class="img-thumbnail" style="max-height: 150px;">
+                  {% else %}
+                  <img id="imagePreview{{ vuelo.codigo }}" src="" 
+                       alt="Previsualización" class="img-thumbnail d-none" style="max-height: 150px;">
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Eliminar Vuelo -->
+  <div class="modal fade" id="deleteFlightModal{{ vuelo.codigo }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">Confirmar Eliminación</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Estás seguro de eliminar el vuelo <strong>{{ vuelo.codigo }}</strong> ({{ vuelo.origen }} a {{ vuelo.destino }})?</p>
+          <p class="text-danger">Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <form method="POST" action="{% url 'delete_flight' vuelo.codigo %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Eliminar Definitivamente</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+// Función para previsualizar imágenes
+function previewImage(id = '') {
+  const containerId = id ? `imagePreviewContainer${id}` : 'imagePreviewContainer';
+  const previewId = id ? `imagePreview${id}` : 'imagePreview';
+  const urlId = id ? `imagen_url${id}` : 'imagen_url';
+  
+  const container = document.getElementById(containerId);
+  const preview = document.getElementById(previewId);
+  const urlInput = document.getElementById(urlId);
+  
+  if (urlInput.value) {
+    preview.src = urlInput.value;
+    container.classList.remove('d-none');
+    preview.classList.remove('d-none');
+  } else {
+    container.classList.add('d-none');
+    preview.classList.add('d-none');
+  }
+}
+
+// Actualizar previsualización cuando cambia la URL
+document.addEventListener('DOMContentLoaded', function() {
+  const urlInputs = document.querySelectorAll('input[type="url"][id^="imagen_url"]');
+  urlInputs.forEach(input => {
+    input.addEventListener('change', function() {
+      const id = this.id.replace('imagen_url', '');
+      previewImage(id);
+    });
+  });
+});
+</script>
+{% endblock %}

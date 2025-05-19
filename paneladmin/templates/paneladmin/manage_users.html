@@ -1,0 +1,198 @@
+{% extends 'paneladmin/panel.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="fw-bold py-3 mb-4">
+    <span class="text-muted fw-light">Administración /</span> Gestión de Usuarios
+  </h4>
+
+  <!-- Card de Tabla de Usuarios -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5>Listado de Usuarios</h5>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+        <i class="bx bx-plus me-2"></i>Nuevo Usuario
+      </button>
+    </div>
+    <div class="table-responsive text-nowrap">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+          {% for usuario in usuarios %}
+          <tr>
+            <td><strong>{{ usuario.id_usuario }}</strong></td>
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.correo }}</td>
+            <td>{{ usuario.id_rol.nombrerol|default:"-" }}</td>
+            <td>
+              {% if usuario.estado %}
+                <span class="badge bg-label-success">Activo</span>
+              {% else %}
+                <span class="badge bg-label-danger">Inactivo</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="dropdown">
+                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                  <i class="bx bx-dots-vertical-rounded"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="javascript:void(0);" 
+                     data-bs-toggle="modal" data-bs-target="#editUserModal{{ usuario.id_usuario }}">
+                    <i class="bx bx-edit-alt me-2"></i> Editar
+                  </a>
+                  <a class="dropdown-item" href="javascript:void(0);" 
+                     data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ usuario.id_usuario }}">
+                    <i class="bx bx-trash me-2"></i> Eliminar
+                  </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal para Crear Usuario -->
+  <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Crear Nuevo Usuario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST" action="{% url 'create_user' %}">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col mb-3">
+                <label for="nombre" class="form-label">Nombre Completo</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col mb-3">
+                <label for="correo" class="form-label">Correo Electrónico</label>
+                <input type="email" id="correo" name="correo" class="form-control" required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col mb-3">
+                <label for="clave" class="form-label">Contraseña</label>
+                <input type="password" id="clave" name="clave" class="form-control" required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col mb-3">
+                <label for="id_rol" class="form-label">Rol</label>
+                <select id="id_rol" name="id_rol" class="form-select">
+                  {% for rol in roles %}
+                  <option value="{{ rol.id_rol }}">{{ rol.nombrerol }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modales para Editar/Eliminar (uno por usuario) -->
+  {% for usuario in usuarios %}
+  <!-- Modal Editar Usuario -->
+  <div class="modal fade" id="editUserModal{{ usuario.id_usuario }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Usuario #{{ usuario.id_usuario }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST" action="{% url 'edit_user' usuario.id_usuario %}">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col mb-3">
+                <label for="nombre{{ usuario.id_usuario }}" class="form-label">Nombre</label>
+                <input type="text" id="nombre{{ usuario.id_usuario }}" name="nombre" 
+                       class="form-control" value="{{ usuario.nombre }}" required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col mb-3">
+                <label for="correo{{ usuario.id_usuario }}" class="form-label">Correo</label>
+                <input type="email" id="correo{{ usuario.id_usuario }}" name="correo" 
+                       class="form-control" value="{{ usuario.correo }}" required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col mb-3">
+                <label for="id_rol{{ usuario.id_usuario }}" class="form-label">Rol</label>
+                <select id="id_rol{{ usuario.id_usuario }}" name="id_rol" class="form-select">
+                  {% for rol in roles %}
+                  <option value="{{ rol.id_rol }}" {% if usuario.id_rol_id == rol.id_rol %}selected{% endif %}>
+                    {{ rol.nombrerol }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col mb-3">
+                <label class="form-label">Estado</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="estado{{ usuario.id_usuario }}" 
+                         name="estado" {% if usuario.estado %}checked{% endif %}>
+                  <label class="form-check-label" for="estado{{ usuario.id_usuario }}">Activo</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Eliminar Usuario -->
+  <div class="modal fade" id="deleteUserModal{{ usuario.id_usuario }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">Confirmar Eliminación</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Estás seguro de eliminar al usuario <strong>{{ usuario.nombre }}</strong>?</p>
+          <p class="text-danger">Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <form method="POST" action="{% url 'delete_user' usuario.id_usuario %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Eliminar Definitivamente</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

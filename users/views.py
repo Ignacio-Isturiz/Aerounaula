@@ -12,6 +12,7 @@ from django.utils.timezone import make_aware
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate
 from axes.utils import reset 
+from django.contrib.auth.hashers import check_password
 from axes.handlers.proxy import AxesProxyHandler
 
 
@@ -223,7 +224,13 @@ def mi_cuenta(request):
         return redirect('login')
 
     usuario = get_object_or_404(Usuario, id_usuario=request.session['usuario_id'])
-
+    
+    if request.method == 'POST' and 'delete_account' in request.POST:
+        # Lógica para eliminar la cuenta
+        usuario.estado = False  # O puedes usar usuario.delete() para eliminación permanente
+        usuario.save()
+        messages.success(request, "Cuenta desactivada exitosamente")
+        return logout_view(request)  # Cierra la sesión después de eliminar
     context = {
         'usuario': usuario,
         'usuario_nombre': request.session.get('usuario_nombre'),
@@ -232,7 +239,7 @@ def mi_cuenta(request):
     }
     return render(request, 'usuarios/mi_cuenta.html', context)
 
-from django.contrib.auth.hashers import check_password
+
 
 def cambiar_contraseña(request):
     if not request.session.get('usuario_id'):
