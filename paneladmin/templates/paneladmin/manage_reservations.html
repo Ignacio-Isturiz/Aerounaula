@@ -1,0 +1,289 @@
+{% extends 'paneladmin/panel.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="fw-bold py-3 mb-4">
+    <span class="text-muted fw-light">Administración /</span> Gestión de Reservas
+  </h4>
+
+  <!-- Card de Tabla de Reservas -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5>Listado de Reservas</h5>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createReservationModal">
+        <i class="bx bx-plus me-2"></i>Nueva Reserva
+      </button>
+    </div>
+    <div class="table-responsive text-nowrap">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Vuelo</th>
+            <th>Fecha Reserva</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+          {% for reserva in reservas %}
+          <tr>
+            <td><strong>#{{ reserva.id_reserva }}</strong></td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm me-2">
+                  <span class="avatar-initial rounded-circle bg-label-primary">{{ reserva.id_usuario.nombre|first }}</span>
+                </div>
+                <div>
+                  <span class="fw-medium">{{ reserva.id_usuario.nombre }}</span><br>
+                  <small class="text-muted">{{ reserva.id_usuario.correo }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <img src="{% if reserva.vuelo.imagen_url %}{{ reserva.vuelo.imagen_url }}{% else %}{% static 'sneat/assets/img/icons/unicons/plane.png' %}{% endif %}" 
+                     alt="Vuelo" class="rounded me-2" width="36" height="36">
+                <div>
+                  <span class="fw-medium">{{ reserva.vuelo.origen }} → {{ reserva.vuelo.destino }}</span><br>
+                  <small class="text-muted">{{ reserva.vuelo.codigo }} | {{ reserva.vuelo.fecha_salida|date:"d/m/Y H:i" }}</small>
+                </div>
+              </div>
+            </td>
+            <td>{{ reserva.fecha_reserva|date:"d/m/Y H:i" }}</td>
+            <td>
+              <div class="dropdown">
+                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                  <i class="bx bx-dots-vertical-rounded"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="javascript:void(0);" 
+                     data-bs-toggle="modal" data-bs-target="#editReservationModal{{ reserva.id_reserva }}">
+                    <i class="bx bx-edit-alt me-2"></i> Editar
+                  </a>
+                  <a class="dropdown-item" href="javascript:void(0);" 
+                     data-bs-toggle="modal" data-bs-target="#cancelReservationModal{{ reserva.id_reserva }}">
+                    <i class="bx bx-x me-2"></i> Cancelar
+                  </a>
+                  <a class="dropdown-item" href="javascript:void(0);" 
+                     data-bs-toggle="modal" data-bs-target="#deleteReservationModal{{ reserva.id_reserva }}">
+                    <i class="bx bx-trash me-2"></i> Eliminar
+                  </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Crear Reserva -->
+<div class="modal fade" id="createReservationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Crear Nueva Reserva</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'create_reservation' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Usuario</label>
+              <select name="id_usuario" class="form-select" required>
+                <option value="">Seleccionar usuario...</option>
+                {% for usuario in usuarios %}
+                <option value="{{ usuario.id_usuario }}">{{ usuario.nombre }} ({{ usuario.correo }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Vuelo</label>
+              <select name="vuelo_codigo" class="form-select" required>
+                <option value="">Seleccionar vuelo...</option>
+                {% for vuelo in vuelos %}
+                <option value="{{ vuelo.codigo }}">{{ vuelo.origen }} → {{ vuelo.destino }} ({{ vuelo.codigo }}) - {{ vuelo.fecha_salida|date:"d/m/Y H:i" }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-12">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="notificarUsuario" name="notificar_usuario" checked>
+                <label class="form-check-label" for="notificarUsuario">Notificar al usuario por correo electrónico</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Reserva</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modales para cada reserva -->
+{% for reserva in reservas %}
+<!-- Modal Editar Reserva -->
+<div class="modal fade" id="editReservationModal{{ reserva.id_reserva }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Reserva #{{ reserva.id_reserva }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'edit_reservation' reserva.id_reserva %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Usuario</label>
+              <input type="text" class="form-control" value="{{ reserva.id_usuario.nombre }} ({{ reserva.id_usuario.correo }})" readonly>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Vuelo</label>
+              <select name="vuelo_codigo" class="form-select" required>
+                {% for vuelo in vuelos %}
+                <option value="{{ vuelo.codigo }}" {% if vuelo.codigo == reserva.vuelo.codigo %}selected{% endif %}>
+                  {{ vuelo.origen }} → {{ vuelo.destino }} ({{ vuelo.codigo }}) - {{ vuelo.fecha_salida|date:"d/m/Y H:i" }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-12">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="notificarUsuarioEdit{{ reserva.id_reserva }}" name="notificar_usuario">
+                <label class="form-check-label" for="notificarUsuarioEdit{{ reserva.id_reserva }}">Notificar al usuario sobre los cambios</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cancelar Reserva -->
+<div class="modal fade" id="cancelReservationModal{{ reserva.id_reserva }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-white">
+        <h5 class="modal-title">Cancelar Reserva #{{ reserva.id_reserva }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'cancel_reservation' reserva.id_reserva %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-12">
+              <p>Usuario: <strong>{{ reserva.id_usuario.nombre }}</strong> ({{ reserva.id_usuario.correo }})</p>
+              <p>Vuelo: <strong>{{ reserva.vuelo.origen }} → {{ reserva.vuelo.destino }}</strong> ({{ reserva.vuelo.codigo }})</p>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">Motivo de cancelación</label>
+              <textarea name="motivo" class="form-control" rows="3" required></textarea>
+              <div class="form-text">Este motivo se enviará al usuario por correo electrónico.</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-warning">Confirmar Cancelación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Eliminar Reserva -->
+<div class="modal fade" id="deleteReservationModal{{ reserva.id_reserva }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Eliminar Reserva #{{ reserva.id_reserva }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'delete_reservation' reserva.id_reserva %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <p>¿Estás seguro de eliminar permanentemente esta reserva?</p>
+          <div class="alert alert-danger">
+            <h6 class="alert-heading">¡Advertencia!</h6>
+            Esta acción no puede deshacerse. Se eliminarán todos los registros asociados a esta reserva.
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <p><strong>Usuario:</strong><br>{{ reserva.id_usuario.nombre }}<br><small>{{ reserva.id_usuario.correo }}</small></p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Vuelo:</strong><br>{{ reserva.vuelo.origen }} → {{ reserva.vuelo.destino }}<br><small>{{ reserva.vuelo.codigo }}</small></p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar Permanentemente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<script>
+// Función para manejar los formularios con AJAX
+document.addEventListener('DOMContentLoaded', function() {
+  const forms = document.querySelectorAll('form[method="POST"]');
+  
+  forms.forEach(form => {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const action = this.getAttribute('action');
+      const modalId = this.closest('.modal')?.id;
+      
+      fetch(action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.success) {
+          if(modalId) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+            modal.hide();
+          }
+          // Mostrar mensaje de éxito
+          showToast('success', data.message || 'Operación realizada con éxito');
+          // Recargar la página después de 1.5 segundos
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          showToast('error', data.error || 'Error en la operación');
+        }
+      })
+      .catch(error => {
+        showToast('error', 'Error en la solicitud: ' + error);
+      });
+    });
+  });
+
+  function showToast(type, message) {
+    alert(`${type.toUpperCase()}: ${message}`);
+  }
+});
+</script>
+{% endblock %}

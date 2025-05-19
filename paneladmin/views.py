@@ -1,10 +1,12 @@
 # paneladmin/views.py
 from django.http import HttpResponseRedirect
 from django.shortcuts import render,redirect
-from dbmodels.models import Usuario, Rol,Vuelos
+from dbmodels.models import Usuario, Rol,Vuelos, Reserva, Asiento
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
-
+from django.http import JsonResponse
+from Aerounaula import settings
+from django.core.mail import send_mail
 
 def panel_admin_view(request):
     rol = request.session.get('usuario_rol')  
@@ -164,3 +166,88 @@ def delete_flight_view(request, flight_code):
 
 #<-------------------------------------reservas--------------------------------------------------->
 
+def manage_reservations_view(request):
+    if request.session.get('usuario_rol') != 'Admin':
+        return redirect('dashboard')
+    
+    reservas = Reserva.objects.select_related('id_usuario', 'vuelo').all().order_by('-fecha_reserva')
+    usuarios = Usuario.objects.filter(estado=True)
+    vuelos = Vuelos.objects.filter(estado='Disponible')
+    
+    context = {
+        'reservas': reservas,
+        'usuarios': usuarios,
+        'vuelos': vuelos,
+        'titulo': 'Gestión de Reservas'
+    }
+    return render(request, 'paneladmin/manage_reservations.html', context)
+
+def create_reservation_view(request):
+    if request.method == 'POST':
+        try:
+            usuario = get_object_or_404(Usuario, id_usuario=request.POST.get('id_usuario'))
+            vuelo = get_object_or_404(Vuelos, codigo=request.POST.get('vuelo_codigo'))
+            
+            Reserva.objects.create(
+                id_usuario=usuario,
+                vuelo=vuelo
+            )
+            messages.success(request, 'Reserva creada exitosamente')
+            return JsonResponse({'success': True})
+        except Exception as e:
+            messages.error(request, f'Error al crear reserva: {str(e)}')
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def edit_reservation_view(request, reservation_id):
+    reserva = get_object_or_404(Reserva, id_reserva=reservation_id)
+    if request.method == 'POST':
+        try:
+            vuelo = get_object_or_404(Vuelos, codigo=request.POST.get('vuelo_codigo'))
+            reserva.vuelo = vuelo
+            reserva.save()
+            messages.success(request, 'Reserva actualizada exitosamente')
+            return JsonResponse({'success': True})
+        except Exception as e:
+            messages.error(request, f'Error al actualizar reserva: {str(e)}')
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def cancel_reservation_view(request, reservation_id):
+    reserva = get_object_or_404(Reserva, id_reserva=reservation_id)
+    if request.method == 'POST':
+        try:
+            motivo = request.POST.get('motivo', 'Cancelación administrativa')
+            reserva.estado = 'cancelada'
+            reserva.motivo_cancelacion = motivo
+            reserva.save()
+            
+            # Enviar email de cancelación
+            send_mail(
+                'Cancelación de tu reserva',
+                f'Hola {reserva.id_usuario.nombre},\n\nTu reserva #{reserva.id_reserva} ha sido cancelada.\nMotivo: {motivo}\n\nEquipo de Aerolínea',
+                settings.DEFAULT_FROM_EMAIL,
+                [reserva.id_usuario.correo],
+                fail_silently=False,
+            )
+            
+            messages.success(request, 'Reserva cancelada y usuario notificado')
+            return JsonResponse({'success': True})
+        except Exception as e:
+            messages.error(request, f'Error al cancelar reserva: {str(e)}')
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def delete_reservation_view(request, reservation_id):
+    reserva = get_object_or_404(Reserva, id_reserva=reservation_id)
+    if request.method == 'POST':
+        try:
+            reserva.delete()
+            messages.success(request, 'Reserva eliminada exitosamente')
+            return JsonResponse({'success': True})
+        except Exception as e:
+            messages.error(request, f'Error al eliminar reserva: {str(e)}')
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+#<---------------------- Asientos ----------------------------->
