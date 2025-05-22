@@ -29,13 +29,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m)vpj*jm)+)z6jemh1^9oy6@8dqfmp^ap9+87!mkz--d=q$()^'
+# SECRET_KEY = 'django-insecure-m)vpj*jm)+)z6jemh1^9oy6@8dqfmp^ap9+87!mkz--d=q$()^'
+
+SECRET_KEY = os.environ.get('SECRET KEY', default="django-insecure-m)vpj*jm)+)z6jemh1^9oy6@8dqfmp^ap9+87!mkz--d=q$()^")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = 'RENDER' not in os.environ
+
 
 ALLOWED_HOSTS = []
 
+RENDER_EXTERNAL_HOSTNAME=os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
@@ -62,6 +68,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'axes.middleware.AxesMiddleware', #fuerza bruta
+    'whitenoise.middleware.WhiteNoiseMiddleware' #whitenoise 
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -144,6 +152,14 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
+
+if not DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Esto busca en la carpeta static global
 ]
