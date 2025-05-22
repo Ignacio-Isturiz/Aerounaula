@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
 
     #apps
@@ -69,7 +70,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'axes.middleware.AxesMiddleware', #fuerza bruta
     'whitenoise.middleware.WhiteNoiseMiddleware' #whitenoise 
-
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -155,19 +155,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 
+# Configuración básica
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Para collectstatic
 
+# Directorios con archivos estáticos
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Usa os.path.join para consistencia
+]
+
+# WhiteNoise solo en producción
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
-
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Esto busca en la carpeta static global
-]
 
 
 # Default primary key field type
