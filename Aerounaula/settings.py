@@ -103,6 +103,7 @@ WSGI_APPLICATION = 'Aerounaula.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+DB_SSLMODE = 'require' if 'neon.tech' in os.environ.get('DB_HOST', '') else 'disable'
 
 DATABASES = {
     'default': {
