@@ -2,11 +2,79 @@
 {% load humanize %}
 {% load static %}
 
-{% block title %}Vuelos disponibles - Aerounaula{% endblock %}
+{% block title %}Vuelos Disponibles - Aerounaula{% endblock %}
 
 {% block content %}
+<div class="header-search-section">
+    <div class="container text-center py-5">
+        <h1 class="text-white mb-3">Encuentra tu vuelo perfecto</h1>
+        <p class="text-white-50 lead">Vuela por Colombia y el mundo con Aerounaula</p>
+        <div class="search-form-container p-4 p-md-5 mx-auto">
+            <form method="get" id="flightSearchForm" class="row g-3 align-items-end">
+                <div class="col-md-4"> {# Adjusted col-md-3 to col-md-4 #}
+                    <label for="origen" class="form-label text-dark-emphasis mb-1"><i class="bi bi-airplane-fill"></i> Origen</label>
+                    <select class="form-select search-input" name="origen" id="origen">
+                        <option value="">Ciudad de origen</option>
+                        {% for ciudad in origenes %}
+                        <option value="{{ ciudad }}" {% if request.GET.origen == ciudad %}selected{% endif %}>{{ ciudad }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4"> {# Adjusted col-md-3 to col-md-4 #}
+                    <label for="destino" class="form-label text-dark-emphasis mb-1"><i class="bi bi-geo-alt-fill"></i> Destino</label>
+                    <select class="form-select search-input" name="destino" id="destino">
+                        <option value="">Ciudad de destino</option>
+                        {% for ciudad in destinos %}
+                        <option value="{{ ciudad }}" {% if request.GET.destino == ciudad %}selected{% endif %}>{{ ciudad }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="fecha_ida" class="form-label text-dark-emphasis mb-1"><i class="bi bi-calendar-check-fill"></i> Fecha de ida</label>
+                    <input type="date" name="fecha_salida" id="fecha_ida" class="form-control search-input" value="{{ request.GET.fecha_salida }}" >
+                </div>
+                <!-- <div class="col-md-2">
+                    <label for="pasajeros" class="form-label text-dark-emphasis mb-1"><i class="bi bi-person-fill"></i> Pasajeros</label>
+                    <select class="form-select search-input" name="pasajeros" id="pasajeros">
+                        <option value="1" {% if request.GET.pasajeros == '1' or not request.GET.pasajeros %}selected{% endif %}>1 pasajero</option>
+                        <option value="2" {% if request.GET.pasajeros == '2' %}selected{% endif %}>2 pasajeros</option>
+                        <option value="3" {% if request.GET.pasajeros == '3' %}selected{% endif %}>3 pasajeros</option>
+                        <option value="4" {% if request.GET.pasajeros == '4' %}selected{% endif %}>4 pasajeros</option>
+                        <option value="5" {% if request.GET.pasajeros == '5' %}selected{% endif %}>5 pasajeros</option>
+                    </select>
+                </div> -->
+                 {% if usuario_rol %} {# Only show for admin/staff to filter by code #}
+                 <div class="col-12 mt-3">
+                    <label for="codigo_vuelo_admin" class="form-label text-dark-emphasis mb-1"><i class="bi bi-barcode"></i> Código de Vuelo</label>
+                    <input type="text" id="codigo_vuelo_admin" name="codigo" value="{{ request.GET.codigo }}" class="form-control search-input" placeholder="Ej: AU1001">
+                 </div>
+                 {% endif %}
+                <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-primary search-button w-100">
+                        <i class="bi bi-airplane-engines-fill me-2"></i> Buscar vuelos
+                    </button>
+                    <a href="{% url 'vuelos' %}" class="btn btn-outline-secondary btn-sm mt-2 w-100 d-md-none" title="Borrar filtros">
+                        <i class="bi bi-trash"></i> Limpiar Filtros
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="container mt-5">
-    <h2 class="mb-4">Ofertas de viaje disponibles</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-title">Vuelos disponibles</h2>
+        {% if vuelos.count > 0 %}
+            <span class="text-muted">{{ vuelos.count }} vuelos encontrados</span>
+        {% endif %}
+        {% if usuario_rol == "Admin" %}
+        <button class="btn btn-primary boton-crear" onclick="abrirModalCrear()">
+            <i class="bi bi-plus-circle me-2"></i> Crear nuevo vuelo
+        </button>
+        {% endif %}
+    </div>
+
     {% if messages %}
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -16,97 +84,119 @@
       {% endfor %}
     {% endif %}
 
-    {% if usuario_rol == "User" %}
-    <form method="get" class="row g-3 mb-4">
-        <div class="col-md-4">
-            <label for="origen">Origen</label>
-            <select class="form-select" name="origen" id="origen">
-                <option value="">Todos</option>
-                {% for ciudad in origenes %}
-                <option value="{{ ciudad }}" {% if request.GET.origen == ciudad %}selected{% endif %}>{{ ciudad }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label for="destino">Destino</label>
-            <select class="form-select" name="destino" id="destino">
-                <option value="">Todos</option>
-                {% for ciudad in destinos %}
-                <option value="{{ ciudad }}" {% if request.GET.destino == ciudad %}selected{% endif %}>{{ ciudad }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="fecha_salida">Fecha de salida</label>
-            <input type="date" name="fecha_salida" id="fecha_salida" class="form-control" min="">
-        </div>
-        {% if usuario_rol %}
-        <div class="col-md-12">
-            <label for="codigo">Código de vuelo:</label>
-            <input type="text" id="codigo" name="codigo" value="{{ request.GET.codigo }}" class="form-control">
-        </div>
-        {% endif %}
-        <div class="col-md-1 d-flex align-items-end">
-            <button type="submit" class="btn boton-filtrar">Filtrar</button>
-        </div>
-        <div class="col-md-1 d-flex align-items-end">
-            <a href="{% url 'vuelos' %}" class="btn btn-outline-secondary" title="Borrar filtros">
-                <i class="bi bi-trash">Limpiar</i>
-            </a>
-        </div>
-    </form>
-    {% endif %}
-
-     {% if usuario_rol == "Admin" %}
-    <button class="btn btn-primary mb-3" onclick="abrirModalCrear()">Crear nuevo vuelo</button>
-    {% endif %}
-
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+    <div id="flightList" class="flight-list">
         {% for vuelo in vuelos %}
-        <div class="col">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ vuelo.imagen_url }}" class="card-img-top" alt="{{ vuelo.destino }}" style="height: 180px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="card-title">{{ vuelo.destino }}</h5>
-                    <p class="card-text">Origen: {{ vuelo.origen }}</p>
-                    <p class="card-text">{{ vuelo.fecha_salida|date:"D d/m" }}</p>
-                    <p class="precio">desde ${{ vuelo.precio|floatformat:0|intcomma }}</p>
-
-                    {% if usuario_rol == "Admin" %}
-                   <button type="button" class="btn btn-sm btn-outline-secondary"
-                        onclick="abrirModalEditar(this)"
-                        data-id="{{ vuelo.codigo }}"
-                        data-origen="{{ vuelo.origen|escapejs }}"
-                        data-destino="{{ vuelo.destino|escapejs }}"
-                        data-fecha="{{ vuelo.fecha_salida|date:'Y-m-d\\TH:i' }}"
-                        data-precio="{{ vuelo.precio }}"
-                        data-estado="{{ vuelo.estado|escapejs }}"
-                        data-imagen="{{ vuelo.imagen_url|escapejs }}">
-                        Editar
-                    </button>
-
-                    <form method="post" action="{% url 'eliminar_vuelo' vuelo.codigo %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
-                    </form>
-                    {% endif %}
-                </div>
-
-                {% if usuario_rol == "User" %}
-                <form method="post" action="{% url 'reservar_vuelo' vuelo.codigo %}" class="text-center mt-2">
-                    {% csrf_token %}
-                    <button type="submit" class="boton-reservar">Reservar</button>
-                </form>
-                {% endif %}
+        <div class="card mb-4 p-3 shadow-sm border-0 rounded-3">
+          <div class="row g-3 align-items-center">
+            <!-- Logo / imagen destino -->
+            <div class="col-md-2 d-flex justify-content-center align-items-center">
+              <img src="{{ vuelo.imagen_url }}" alt="Destino" class="rounded" style="width: 100%; height: 110px; object-fit: cover;">
             </div>
+        
+            <!-- Información del vuelo -->
+            <div class="col-md-7">
+              <div class="text-muted small mb-2">
+                Codigo: {{ vuelo.codigo }}
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                <span class="fw-bold">{{ vuelo.origen }}</span>
+                <span class="mx-2"><i class="bi bi-arrow-right"></i></span>
+                <span class="fw-bold">{{ vuelo.destino }}</span>
+                </div>
+                <div class="d-flex align-items-center gap-4 text-secondary mb-2">
+                  <div class="d-flex align-items-center gap-1">
+                    <i class="bi bi-wifi fs-5 text-primary" title="Wi-Fi disponible"></i>
+                    <span class="small">Wi-Fi</span>
+                  </div>
+                  <div class="d-flex align-items-center gap-1">
+                    <i class="bi bi-cup-straw fs-5 text-warning" title="Bebidas incluidas"></i>
+                    <span class="small">Bebidas</span>
+                  </div>
+                  <div class="d-flex align-items-center gap-1">
+                    <i class="bi bi-briefcase-fill fs-5 text-success" title="Equipaje de mano"></i>
+                    <span class="small">Equipaje</span>
+                    </div>
+                </div>
+              <div class="d-flex align-items-center gap-3">
+                <div class="text-muted small">
+                  <i class="bi bi-calendar-event me-1"></i>{{ vuelo.fecha_salida|date:"d/m/Y" }}
+                </div>
+              </div>
+            </div>
+        
+            <!-- Precio y acción -->
+            <div class="col-md-3 text-end">
+              <small class="text-muted">Precio por persona</small>
+              <div class="fs-5 fw-bold text-primary mb-2">${{ vuelo.precio|floatformat:0|intcomma }}</div>
+              {% if usuario_rol == "User" %}
+              <form method="post" action="{% url 'reservar_vuelo' vuelo.codigo %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary w-50">Reservar</button>
+              </form>
+              {% elif usuario_rol == "Admin" %}
+              <div class="admin-actions">
+                <button type="button" class="btn btn-outline-secondary btn-sm w-100 mb-1"
+                  onclick="abrirModalEditar(this)"
+                  data-id="{{ vuelo.codigo }}"
+                  data-origen="{{ vuelo.origen|escapejs }}"
+                  data-destino="{{ vuelo.destino|escapejs }}"
+                  data-fecha="{{ vuelo.fecha_salida|date:'Y-m-d\\TH:i' }}"
+                  data-precio="{{ vuelo.precio }}"
+                  data-estado="{{ vuelo.estado|escapejs }}"
+                  data-imagen="{{ vuelo.imagen_url|escapejs }}"
+                  data-origen-code="{{ vuelo.origen_code|escapejs }}"
+                  data-destino-code="{{ vuelo.destino_code|escapejs }}">
+                  <i class="bi bi-pencil-square"></i> Editar
+                </button>
+                <form method="post" action="{% url 'eliminar_vuelo' vuelo.codigo %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                    <i class="bi bi-trash"></i> Eliminar
+                  </button>
+                </form>
+              </div>
+              {% endif %}
+            </div>
+          </div>
         </div>
         {% empty %}
-        <p class="text-center">No hay vuelos disponibles en este momento.</p>
+        <div class="alert alert-info text-center" role="alert">
+          <i class="bi bi-info-circle me-2"></i> No hay vuelos disponibles que coincidan con tus criterios.
+        </div>
         {% endfor %}
+
+    {% if vuelos.has_other_pages %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination custom-pagination">
+                {% if vuelos.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ vuelos.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Anterior</a>
+                    </li>
+                {% endif %}
+
+                {% for i in vuelos.paginator.page_range %}
+                    {% if vuelos.number == i %}
+                        <li class="page-item active" aria-current="page"><span class="page-link">{{ i }}</span></li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if vuelos.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ vuelos.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Siguiente</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
+    {% endif %}
+
 </div>
 
-<!-- MODAL Crear/Editar Vuelo -->
 <div class="modal fade" id="vueloModal" tabindex="-1" aria-labelledby="vueloModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -117,24 +207,34 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          <input type="hidden" name="codigo" id="codigo">
-          <label>Origen:</label>
-          <input type="text" name="origen" id="origen" class="form-control">
-
-          <label>Destino:</label>
-          <input type="text" name="destino" id="destino" class="form-control">
-
-          <label>Fecha de salida:</label>
-          <input type="date" name="fecha_salida" id="fecha_salida" class="form-control">
-
-          <label>Precio:</label>
-          <input type="number" step="0.01" name="precio" id="precio" class="form-control">
-
-          <label>Estado:</label>
-          <input type="text" name="estado" id="estado" class="form-control">
-
-          <label>Imagen URL:</label>
-          <input type="text" name="imagen_url" id="imagen_url" class="form-control">
+          <input type="hidden" name="codigo" id="modal-codigo">
+          <div class="mb-3">
+            <label for="modal-origen" class="form-label">Origen:</label>
+            <input type="text" name="origen" id="modal-origen" class="form-control" >
+          </div>
+          <div class="mb-3">
+            <label for="modal-origen-code" class="form-label">Código Origen (Ej: BOG):</label>
+            <input type="text" name="origen_code" id="modal-origen-code" class="form-control" maxlength="3" >
+          </div>
+          <div class="mb-3">
+            <label for="modal-destino" class="form-label">Destino:</label>
+            <input type="text" name="destino" id="modal-destino" class="form-control" >
+          </div>
+          <div class="mb-3">
+            <label for="modal-destino-code" class="form-label">Código Destino (Ej: MDE):</label>
+            <input type="text" name="destino_code" id="modal-destino-code" class="form-control" maxlength="3" >
+          </div>
+          <div class="mb-3">
+            <label for="modal-fecha_salida" class="form-label">Fecha y Hora de Salida:</label>
+            <input type="datetime-local" name="fecha_salida" id="modal-fecha_salida" class="form-control" >
+          </div>
+          <div class="mb-3">
+            <label for="modal-fecha_llegada" class="form-label">Fecha y Hora de Llegada:</label>
+            <input type="datetime-local" name="fecha_llegada" id="modal-fecha_llegada" class="form-control" >
+          </div>
+            <label for="modal-imagen_url" class="form-label">URL de la Imagen (de la ciudad de destino):</label>
+            <input type="url" name="imagen_url" id="modal-imagen_url" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -148,4 +248,3 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'js/vuelos.js' %}"></script>
 {% endblock %}
-

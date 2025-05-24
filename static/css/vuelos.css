@@ -1,46 +1,271 @@
-.boton-reservar{
-    background: linear-gradient(45deg, #b52d00, #ff9f1a); 
-    border: none;
-    padding: 8px 16px; 
-    font-weight: bold;
-    border-radius: 8px;
-    color: white;
-    display: inline-block; /* Cambiado a inline-block para evitar que se estire */
-    font-size: 14px; /* Reducido el tamaño de la fuente */
-    transition: background 0.3s, transform 0.2s;
-    max-width: 150px; /* Añadí un máximo de ancho */
-    margin: 0 auto; /* Centra el botón */
-    margin-bottom: 20px; /* Espacio adicional al fondo */
+/* General Body and Container Enhancements */
+body {
+    background-color: #f0f2f5; /* Lighter gray background */
+    font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* A more modern font */
 }
 
-.boton-reservar:hover {
-    background: linear-gradient(45deg, #a93226, #e67e22); 
-    transform: scale(1.05);
+/* Header Search Section */
+.header-search-section {
+    background: linear-gradient(135deg, #2a61c4, #004d9c); /* Deeper blue gradient */
+    color: white;
+    padding: 60px 0;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
-/* Alineación de los filtros */
-form .col-md-4, form .col-md-3 {
+
+.header-search-section h1 {
+    font-weight: 800;
+    font-size: 3.5rem;
+    letter-spacing: -1px;
+}
+
+.header-search-section .lead {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.search-form-container {
+    background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white */
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    max-width: 900px; /* Adjust as needed */
+}
+
+.search-form-container .form-label {
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    align-items: center;
+}
+
+.search-form-container .form-label i {
+    margin-right: 8px;
+    color: #007bff; /* A subtle blue for icons */
+}
+
+.search-input {
+    border-radius: 8px;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    font-size: 1rem;
+    background-color: #f8f9fa; /* Light background for inputs */
+}
+
+.search-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+    background-color: #ffffff;
+}
+
+.search-button {
+    background: linear-gradient(45deg, #007bff, #0056b3); /* Blue gradient */
+    border: none;
+    padding: 12px 25px;
+    font-weight: bold;
+    border-radius: 10px;
+    color: white;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.search-button:hover {
+    background: linear-gradient(45deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+/* Flight List Section */
+.section-title {
+    color: #343a40;
+    font-weight: 700;
+    font-size: 2rem;
+}
+
+.flight-list {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 15px; /* Spacing between flight cards */
 }
 
-/* Alineación y tamaño del botón Filtrar */
-.boton-filtrar {
-    background: linear-gradient(45deg, #b52d00, #ff9f1a); 
+.flight-card-item {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.flight-card-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+}
+
+.airline-logo {
+    width: 50px; /* Adjust size as needed */
+    height: 50px;
+    object-fit: contain;
+}
+
+.flight-time {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #343a40;
+}
+
+.flight-location {
+    font-size: 1.1rem;
+    color: #495057;
+}
+
+.flight-city {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.flight-duration {
+    font-size: 0.95rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.flight-path {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.flight-path i {
+    color: #007bff;
+    font-size: 1.1rem;
+}
+
+.flight-direct-text {
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.price-per-person {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.flight-price {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #28a745; /* Green for price */
+    margin-bottom: 10px;
+}
+
+.select-flight-button {
+    background: linear-gradient(45deg, #007bff, #0056b3); /* Blue gradient */
     border: none;
-    padding: 8px 16px;
+    padding: 10px 20px;
     font-weight: bold;
     border-radius: 8px;
     color: white;
-    font-size: 14px;
-    transition: background 0.3s, transform 0.2s;
-    width: 100%;  /* 100% width to make the button fit the container */
-    max-width: 150px;
-    align-self: flex-start;  /* Align the button with the filters */
-    margin-top: 16px;  /* Add some margin at the top for separation */
+    font-size: 1rem;
+    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
 }
 
-.boton-filtrar:hover {
-    background: linear-gradient(45deg, #a93226, #e67e22); 
-    transform: scale(1.05);
+.select-flight-button:hover {
+    background: linear-gradient(45deg, #0056b3, #004085);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(0, 123, 255, 0.4);
+}
+
+.flight-detail-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.7em;
+}
+
+/* Admin Specific Buttons */
+.admin-actions .btn {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+.boton-crear {
+    background: linear-gradient(45deg, #28a745, #218838); /* Green gradient for 'Crear' */
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+}
+
+.boton-crear:hover {
+    background: linear-gradient(45deg, #218838, #1e7e34);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(40, 167, 69, 0.4);
+}
+
+/* Pagination Styling */
+.custom-pagination .page-item .page-link {
+    border-radius: 8px;
+    margin: 0 4px;
+    color: #007bff;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+}
+
+.custom-pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+}
+
+.custom-pagination .page-item .page-link:hover {
+    background-color: #e9ecef;
+    border-color: #007bff;
+    color: #0056b3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .header-search-section h1 {
+        font-size: 2.5rem;
+    }
+    .header-search-section .lead {
+        font-size: 1rem;
+    }
+    .search-form-container {
+        padding: 20px;
+    }
+    .flight-card-item .col-auto {
+        flex-basis: 100%;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+    .flight-card-item .col-3, .flight-card-item .col {
+        flex-basis: 50%;
+        margin-bottom: 15px;
+    }
+    .flight-card-item .col:last-child {
+        text-align: center;
+    }
+    .flight-price {
+        font-size: 1.8rem;
+    }
+    .select-flight-button {
+        width: 100%;
+        padding: 8px 15px;
+    }
+    .admin-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
 }

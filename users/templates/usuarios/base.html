@@ -1,55 +1,102 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Aerounaula{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    <link rel="stylesheet" href="{% static 'css/vuelos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vuelos.css' %}"> {# Asegúrate de que vuelos.css también sea responsive #}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    {% block extra_head %}
+    {# Este bloque se rellenará con CSS adicional de los templates hijos #}
+    {% endblock %}
 </head>
 <body>
 
 {% if not ocultar_navbar %}
 <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
-    <div class="container-fluid px-5">
-        <a class="navbar-brand text-white" href="/">✈ Aerounaulaaaaaaa</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav me-auto">
+    <div class="container-fluid px-sm-3 px-md-5">
+        <a class="navbar-brand d-flex align-items-center text-white" href="/">
+            <div class="navbar-logo me-2">
+                <i class="bi bi-airplane-fill"></i>
+            </div>
+            <span class="fw-bold">Aerounaula</span>
+        </a>
+        <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0"> {# Añadido margen inferior para pantallas pequeñas #}
                 <li class="nav-item">
                     <a class="nav-link {% if request.path == '/vuelos/' %}active{% endif %}" href="{% url 'vuelos' %}">Vuelos</a>
+                </li>
                 {% if request.session.usuario_id and usuario_rol == "User" %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'mis_reservas' %}">Tus reservas</a>
-                    </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'mis_reservas' %}">Tus reservas</a>
+                </li>
                 {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'info_equipaje' %}">Equipaje</a>
                 </li>
             </ul>
             {% if request.session.usuario_id %}
-                <div class="dropdown me-3">
-                    <a class="btn btn-outline-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        👤 {{ request.session.usuario_nombre }}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{% url 'mi_cuenta' %}">Mi cuenta</a></li>
-                        <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar sesión</a></li>
-                    </ul>
-                </div>
+            <div class="dropdown">
+                <a class="btn btn-outline-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    👤 {{ request.session.usuario_nombre }}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{% url 'mi_cuenta' %}">Mi cuenta</a></li>
+                    <li><hr class="dropdown-divider"></li> {# Separador para mejor UI #}
+                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar sesión</a></li>
+                </ul>
+            </div>
             {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline-light">Iniciar sesión</a>
+            <a href="{% url 'login' %}" class="btn btn-outline-light">Iniciar sesión</a>
             {% endif %}
         </div>
     </div>
 </nav>
 {% endif %}
 
-<div class="container" style="padding-top: 6rem;">
-    {% block content %}
-    {% endblock %}
+{% block content %}
+{% endblock %}
+<div class="container mt-5" style="padding-top: 6rem;">
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<footer class="footer-custom text-white mt-5">
+    <div class="container py-4 d-flex flex-column flex-md-row justify-content-between align-items-center align-items-md-start text-center text-md-start"> {# Centrado de texto para móviles #}
+        <div class="mb-3 mb-md-0"> {# Espacio entre secciones del footer en móvil #}
+            <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-2"> {# Centrado del logo en móvil #}
+                <div class="footer-logo me-2"></div>
+                <strong class="fs-5">Aerounaula</strong>
+            </div>
+            <p class="mb-0">Tu aerolínea de confianza para volar por Colombia y el mundo.</p>
+        </div>
+        <div class="mb-3 mb-md-0">
+            <h6 class="fw-bold">Servicios</h6> {# Títulos más fuertes #}
+            <ul class="list-unstyled">
+                <li>Vuelos nacionales</li>
+                <li>Vuelos internacionales</li>
+                <li>Equipaje</li>
+            </ul>
+        </div>
+        <div>
+            <h6 class="fw-bold">Síguenos</h6>
+            <div class="d-flex gap-2 justify-content-center justify-content-md-start"> {# Centrado de iconos en móvil #}
+                <a href="#" class="footer-icon"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="footer-icon"><i class="bi bi-twitter"></i></a>
+                <a href="#" class="footer-icon"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="footer-icon"><i class="bi bi-linkedin"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="text-center small py-2 border-top border-light">
+        © 2024 Aerounaula. Todos los derechos reservados.
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,38 +1,78 @@
-function setMinFechaSalida() {
-  const ahora = new Date();
-  const minFecha = ahora.toISOString().split('T')[0];
-  document.getElementById("fecha_salida").min = minFecha;
-}
+document.addEventListener('DOMContentLoaded', function () {
+    const vueloModal = new bootstrap.Modal(document.getElementById('vueloModal'));
+    const formVuelo = document.getElementById('formVuelo');
+    const modalTitle = document.getElementById('vueloModalLabel');
 
-function abrirModalCrear() {
-  const form = document.getElementById("formVuelo");
-  form.action = form.dataset.createUrl;
-  document.getElementById("vueloModalLabel").innerText = "Crear Vuelo";
-  form.reset();
-  setMinFechaSalida();
-  new bootstrap.Modal(document.getElementById('vueloModal')).show();
-}
+    // Referencias a los campos del modal
+    const modalCodigo = document.getElementById('modal-codigo');
+    const modalOrigen = document.getElementById('modal-origen');
+    const modalOrigenCode = document.getElementById('modal-origen-code');
+    const modalDestino = document.getElementById('modal-destino');
+    const modalDestinoCode = document.getElementById('modal-destino-code');
+    const modalAeronave = document.getElementById('modal-aeronave');
+    const modalFechaSalida = document.getElementById('modal-fecha_salida');
+    const modalFechaLlegada = document.getElementById('modal-fecha_llegada');
+    const modalDuracion = document.getElementById('modal-duracion');
+    const modalTipoVuelo = document.getElementById('modal-tipo_vuelo');
+    const modalPrecio = document.getElementById('modal-precio');
+    const modalEstado = document.getElementById('modal-estado');
+    const modalImagenUrl = document.getElementById('modal-imagen_url');
 
-function abrirModalEditar(button) {
-  const form = document.getElementById("formVuelo");
-  form.action = `/vuelos/editar/${button.dataset.id}/`;
-  document.getElementById("vueloModalLabel").innerText = "Editar Vuelo";
-  document.getElementById("codigo").value = button.dataset.id;
-  document.getElementById("origen").value = button.dataset.origen;
-  document.getElementById("destino").value = button.dataset.destino;
-  document.getElementById("fecha_salida").value = button.dataset.fecha.split("T")[0];
-  document.getElementById("precio").value = button.dataset.precio;
-  document.getElementById("estado").value = button.dataset.estado;
-  document.getElementById("imagen_url").value = button.dataset.imagen;
-  setMinFechaSalida();
-  new bootstrap.Modal(document.getElementById('vueloModal')).show();
-}
+    window.abrirModalCrear = function () {
+        modalTitle.textContent = 'Crear Nuevo Vuelo';
+        formVuelo.action = formVuelo.dataset.createUrl;
+        formVuelo.reset();
 
-document.addEventListener('DOMContentLoaded', () => {
-  const fechaInput = document.getElementById('fecha_salida');
-  if (fechaInput) {
-    const ahora = new Date();
-    const minFecha = ahora.toISOString().split('T')[0]
-    fechaInput.min = minFecha;
-  }
+        // Limpiar manualmente los campos
+        modalCodigo.value = '';
+        modalOrigen.value = '';
+        modalOrigenCode.value = '';
+        modalDestino.value = '';
+        modalDestinoCode.value = '';
+        modalAeronave.value = '';
+        modalFechaSalida.value = '';
+        modalFechaLlegada.value = '';
+        modalDuracion.value = '';
+        modalTipoVuelo.value = '';
+        modalPrecio.value = '';
+        modalEstado.value = '';
+        modalImagenUrl.value = '';
+
+        vueloModal.show();
+    };
+
+    window.abrirModalEditar = function (button) {
+        modalTitle.textContent = 'Editar Vuelo';
+        const vueloId = button.dataset.id;
+
+        formVuelo.action = `/vuelos/editar/${vueloId}/`;
+
+        modalCodigo.value = vueloId;
+        modalOrigen.value = button.dataset.origen || '';
+        modalOrigenCode.value = button.dataset.origenCode || '';
+        modalDestino.value = button.dataset.destino || '';
+        modalDestinoCode.value = button.dataset.destinoCode || '';
+        modalAeronave.value = button.dataset.aeronave || '';
+        modalFechaSalida.value = button.dataset.fecha ? button.dataset.fecha.substring(0, 16) : '';
+        modalFechaLlegada.value = button.dataset.fechaLlegada ? button.dataset.fechaLlegada.substring(0, 16) : '';
+        modalDuracion.value = button.dataset.duracion || '';
+        modalTipoVuelo.value = button.dataset.tipoVuelo || '';
+        modalPrecio.value = button.dataset.precio || '';
+        modalEstado.value = button.dataset.estado || '';
+        modalImagenUrl.value = button.dataset.imagen || '';
+
+        vueloModal.show();
+    };
+
+    // Configura fecha mínima en el filtro de búsqueda
+    const fechaIdaFilter = document.getElementById('fecha_ida');
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    const minDate = `${year}-${month}-${day}`;
+
+    if (fechaIdaFilter) {
+        fechaIdaFilter.min = minDate;
+    }
 });

@@ -1,0 +1,193 @@
+/* Estilos para el nuevo Hero Section (similar a la segunda imagen) */
+.hero-section-alt {
+    height:100vh;
+    background-image: url('../images/airplane_background.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.hero-section-alt::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4); /* Overlay oscuro para que el texto resalte */
+    z-index: 1;
+}
+
+.hero-section-alt .container {
+    position: relative;
+    z-index: 2; /* Asegura que el contenido esté por encima del overlay */
+}
+
+.hero-section-alt h1 {
+    font-size: 3.5rem; /* Tamaño de fuente para el título */
+    line-height: 1.2;
+}
+
+.hero-section-alt .text-info {
+        color: #3eb2fd !important;
+}
+
+.hero-section-alt .btn-info {
+    background-color: #00bcd4; /* Color del botón "Reserva ahora" */
+    border-color: #00bcd4;
+    font-weight: bold;
+    padding: 0.8rem 2rem;
+    border-radius: 50px; /* Bordes redondeados */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,188,212,0.3);
+}
+
+.hero-section-alt .btn-info:hover {
+    background-color: #0097a7; /* Color de hover */
+    border-color: #0097a7;
+}
+
+/* Estilos para la sección de búsqueda de vuelos (similar a la tercera imagen) */
+.flight-search-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    max-width: 900px; /* Ancho máximo para la tarjeta de búsqueda */
+    padding: 2.5rem; /* Padding interno */
+}
+
+.flight-search-card .nav-pills .nav-link {
+    border-radius: 8px; /* Bordes redondeados para las pestañas */
+    font-weight: 500;
+    color: #6c757d; /* Color de texto para pestañas inactivas */
+    background-color: #e9ecef; /* Fondo suave para pestañas inactivas */
+    padding: 0.75rem 1.5rem;
+    margin-right: 0.5rem; /* Espacio entre pestañas */
+}
+
+.flight-search-card .nav-pills .nav-link.active {
+    background-color: #0d6efd; /* Color azul de Bootstrap primary */
+    color: #fff;
+}
+
+.flight-search-card .input-group-text {
+    background-color: #e9ecef; /* Fondo de los iconos */
+    border-right: none;
+    border-color: #dee2e6;
+}
+
+.flight-search-card .form-control,
+.flight-search-card .form-select {
+    border-left: none;
+    border-color: #dee2e6;
+    height: calc(2.25rem + 2px); /* Ajustar altura */
+    padding-left: 0.75rem;
+}
+
+.flight-search-card .form-control:focus,
+.flight-search-card .form-select:focus {
+    box-shadow: none;
+    border-color: #86b7fe; /* Color de borde al enfocar */
+}
+
+.flight-search-card .btn-primary {
+    background-color: #0d6efd; /* Color azul de Bootstrap primary */
+    border-color: #0d6efd;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+.flight-search-card .btn-primary:hover {
+    background-color: #0a58ca;
+    border-color: #0a58ca;
+}
+
+
+/* Estilos para tu contenido existente (ajustes para separación) */
+.container.mt-5 {
+    margin-top: 3rem !important; /* Asegura un buen espacio después del formulario de búsqueda */
+}
+
+/* Estilos de las tarjetas de información (reason-card y card-info) */
+.reason-card, .card-info {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+    height: 100%; /* Asegura que todas las tarjetas tengan la misma altura */
+}
+
+.reason-card:hover, .card-info:hover {
+    transform: translateY(-5px);
+}
+
+.reason-card .reason-icon-wrapper {
+    background-color: #e0f2f7; /* Un color de fondo suave para los iconos */
+    color: #00bcd4; /* Color del icono */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+}
+
+.card-info img {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    width: 100%;
+    height: 180px; /* Altura fija para las imágenes */
+    object-fit: cover; /* Recorta la imagen para que cubra el área */
+}
+
+.card-info .card-info-body {
+    padding: 1.5rem;
+}
+
+.card-info h5 {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.card-info p {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.card:hover img {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+}
+
+.destino-img {
+  height: 250px;
+  object-fit: cover;
+  width: 100%;
+  border-radius: 0.5rem;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .hero-section-alt h1 {
+        font-size: 2.5rem;
+    }
+    .flight-search-card {
+        padding: 1.5rem;
+    }
+    .flight-search-card .nav-pills .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        margin-right: 0.25rem;
+        margin-bottom: 0.5rem; /* Espacio para que no se peguen en móvil */
+    }
+    .flight-search-card .nav-pills {
+        flex-wrap: wrap; /* Permite que las pestañas se envuelvan */
+        justify-content: center; /* Centra las pestañas */
+    }
+}

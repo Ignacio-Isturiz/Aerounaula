@@ -364,5 +364,3 @@ def confirmar_asientos(request):
 
 def info_equipaje(request):
     return render(request, 'informacion/equipaje.html')
-
-

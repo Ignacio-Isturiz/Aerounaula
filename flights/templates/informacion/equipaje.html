@@ -1,5 +1,7 @@
 {% extends "usuarios/base.html" %}
 
+{% load static %}
+
 {% block title %}Prepara tu equipaje{% endblock %}
 
 {% block content %}
@@ -8,33 +10,54 @@
     <p class="text-center mb-5">Viaja a tu medida con el equipaje que necesitas</p>
 
     <!-- Artículo personal -->
-    <div class="bg-white shadow-sm rounded p-4 mb-4">
-        <h5>Artículo personal</h5>
-        <p>Puede ser una cartera, morral, pañalera, un bolso para llevar un portátil o un paquete.</p>
-        <ul>
-            <li><strong>Medidas máximas:</strong> 45 x 35 x 20 cm (alto, largo y ancho).</li>
-            <li>Asegúrate que puedas ubicarlo debajo del asiento delantero.</li>
-        </ul>
+    <div class="row align-items-center mb-5">
+        <div class="col-md-4 text-center mb-3 mb-md-0">
+            <img src="{% static 'images/equipaje/personal.svg' %}" alt="Artículo personal" class="img-fluid" style="max-height: 250px;">
+        </div>
+        <div class="col-md-8">
+            <div class="bg-white shadow-sm rounded p-4">
+                <h5 class="fw-bold">Artículo personal</h5>
+                <p>Puedes llevar una cartera, morral, pañalera, bolso para portátil o un paquete pequeño.</p>
+                <ul>
+                    <li><strong>Medidas máximas:</strong> 45 x 35 x 20 cm (alto, largo y ancho).</li>
+                    <li>Debe caber debajo del asiento delantero.</li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <!-- Equipaje de mano -->
-    <div class="bg-white shadow-sm rounded p-4 mb-4">
-        <h5>Equipaje de mano</h5>
-        <p>Puedes llevarlo contigo en la cabina del avión y ubicarlo en el compartimiento superior.</p>
-        <ul>
-            <li><strong>Medidas máximas:</strong> 55 x 35 x 25 cm (alto, largo y ancho), incluyendo ruedas y manijas.</li>
-            <li><strong>Peso máximo:</strong> 10 kg. Si no cumple, se registra como equipaje de bodega.</li>
-        </ul>
+    <div class="row align-items-center mb-5 flex-md-row-reverse">
+        <div class="col-md-4 text-center mb-3 mb-md-0">
+            <img src="{% static 'images/equipaje/equipaje.svg' %}" alt="Artículo personal" class="img-fluid" style="max-height: 250px;">
+        </div>
+        <div class="col-md-8">
+            <div class="bg-white shadow-sm rounded p-4">
+                <h5 class="fw-bold">Equipaje de mano</h5>
+                <p>Puedes llevarlo en cabina y ubicarlo en el compartimiento superior del avión.</p>
+                <ul>
+                    <li><strong>Medidas máximas:</strong> 55 x 35 x 25 cm (alto, largo y ancho), incluyendo ruedas y manijas.</li>
+                    <li><strong>Peso máximo:</strong> 10 kg.</li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <!-- Equipaje de bodega -->
-    <div class="bg-white shadow-sm rounded p-4 mb-4">
-        <h5>Equipaje de bodega</h5>
-        <p>Regístralo en el counter del aeropuerto antes de ir a la sala de abordaje.</p>
-        <ul>
-            <li><strong>Medidas máximas:</strong> no debe exceder los 158 cm (62") lineales.</li>
-            <li><strong>Peso máximo:</strong> 23 kg en Clase económica y 32 kg en Business Class.</li>
-        </ul>
+    <div class="row align-items-center mb-5">
+        <div class="col-md-4 text-center mb-3 mb-md-0">
+            <img src="{% static 'images/equipaje/bodega.svg' %}" alt="Artículo personal" class="img-fluid" style="max-height: 250px;">
+        </div>
+        <div class="col-md-8">
+            <div class="bg-white shadow-sm rounded p-4">
+                <h5 class="fw-bold">Equipaje de bodega</h5>
+                <p>Debes registrarlo en el counter del aeropuerto antes de abordar.</p>
+                <ul>
+                    <li><strong>Medidas máximas:</strong> no superar los 158 cm (62") lineales (alto + largo + ancho).</li>
+                    <li><strong>Peso máximo:</strong> 23 kg en clase económica y 32 kg en Business Class.</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
