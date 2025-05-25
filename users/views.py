@@ -77,7 +77,14 @@ def registro_view(request):
             if Usuario.objects.filter(correo=correo).exists():
                 messages.error(request, "El correo ya está registrado.")
             else:
+                try:
+                    rol_user = Rol.objects.get(nombrerol='User')
+                except Rol.DoesNotExist:
+                    messages.error(request, "Error interno: no se encontró el rol 'User'. Contacta al administrador.")
+                    return redirect('registro')
+
                 token = generar_token()
+
                 nuevo_usuario = Usuario(
                     nombre=form.cleaned_data['nombre'],
                     correo=correo,
@@ -85,7 +92,8 @@ def registro_view(request):
                     estado=True,
                     confirmado=False,
                     token=token,
-                    fechatoken=timezone.now()
+                    fechatoken=timezone.now(),
+                    id_rol=rol_user
                 )
                 nuevo_usuario.save()
 
@@ -94,6 +102,7 @@ def registro_view(request):
                     'nombre': nuevo_usuario.nombre,
                     'url_confirmacion': url_confirmacion
                 })
+
                 send_mail(
                     subject="Confirma tu cuenta",
                     message="",
@@ -107,7 +116,11 @@ def registro_view(request):
     else:
         form = RegistroForm()
 
-    return render(request, 'usuarios/registro.html', {'form': form, 'titulo': 'Registro', 'ocultar_navbar': True})
+    return render(request, 'usuarios/registro.html', {
+        'form': form,
+        'titulo': 'Registro',
+        'ocultar_navbar': True
+    })
 
 # ---------------------- CONFIRMACIÓN DE CUENTA ----------------------
 def confirmar_cuenta(request, token):
