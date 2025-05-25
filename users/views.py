@@ -14,6 +14,7 @@ from django.contrib.auth import authenticate
 from axes.utils import reset 
 from django.contrib.auth.hashers import check_password
 from axes.handlers.proxy import AxesProxyHandler
+from django.http import HttpResponse
 
 
 # ---------------------- GENERAR TOKEN ----------------------
@@ -108,6 +109,18 @@ def registro_view(request):
 
     return render(request, 'usuarios/registro.html', {'form': form, 'titulo': 'Registro', 'ocultar_navbar': True})
 
+def probar_correo(request):
+    try:
+        send_mail(
+            subject='Correo de prueba',
+            message='Esto es una prueba.',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=['tucorreo@gmail.com'],
+            fail_silently=False,
+        )
+        return HttpResponse("✅ Correo enviado correctamente.")
+    except Exception as e:
+        return HttpResponse(f"❌ Error al enviar correo: {str(e)}")
 
 # ---------------------- CONFIRMACIÓN DE CUENTA ----------------------
 def confirmar_cuenta(request, token):
