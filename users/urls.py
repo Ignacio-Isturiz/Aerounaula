@@ -11,6 +11,5 @@ urlpatterns = [
     path('confirmar/<str:token>/', views.confirmar_cuenta, name='confirmar_cuenta'),
     path('mi-cuenta/', views.mi_cuenta, name='mi_cuenta'),
     path('mi-cuenta/cambiar-clave/', views.cambiar_contraseña, name='cambiar_contraseña'),
-    path('probar-correo/', views.probar_correo, name='probar_correo'),
-    
+        
 ]
