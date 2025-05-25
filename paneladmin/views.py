@@ -255,10 +255,15 @@ def manage_seats_view(request):
     if request.session.get('usuario_rol') != 'Admin':
         return redirect('dashboard')
     
-    asientos = Asiento.objects.select_related('codigo', 'usuario_reservado').all().order_by('codigo__codigo', 'asiento_numero')
+    asientos = Asiento.objects.select_related('codigo', 'usuario_reservado')\
+    .all().order_by('-reservado', 'codigo__codigo', 'asiento_numero')
+    vuelos = Vuelos.objects.all()
+    usuarios = Usuario.objects.all()
 
     context = {
         'asientos': asientos,
+        'vuelos': vuelos,
+        'usuarios': usuarios,
         'titulo': 'Gestión de Asientos'
     }
     return render(request, 'paneladmin/manage_seats.html', context)
@@ -267,25 +272,47 @@ def create_seat_view(request):
     if request.method == 'POST':
         try:
             vuelo = get_object_or_404(Vuelos, codigo=request.POST.get('vuelo_codigo'))
-            Asiento.objects.create(
-                codigo=vuelo,
-                asiento_numero=request.POST.get('asiento_numero'),
-                reservado=request.POST.get('reservado') == 'on',
-                usuario_reservado_id=request.POST.get('usuario_reservado') or None
-            )
-            messages.success(request, 'Asiento creado exitosamente.')
+            asiento_numero = request.POST.get('asiento_numero')
+            reservado = request.POST.get('reservado') == 'on'
+            usuario_id = request.POST.get('usuario_reservado') or None
+
+            if usuario_id:
+                asiento_existente = Asiento.objects.filter(codigo=vuelo, usuario_reservado_id=usuario_id).first()
+                if asiento_existente:
+                    asiento_existente.asiento_numero = asiento_numero
+                    asiento_existente.reservado = reservado
+                    asiento_existente.save()
+                    asiento = asiento_existente
+                else:
+                    asiento = Asiento.objects.create(
+                        codigo=vuelo,
+                        asiento_numero=asiento_numero,
+                        reservado=reservado,
+                        usuario_reservado_id=usuario_id
+                    )
+                usuario = Usuario.objects.filter(id_usuario=usuario_id).first()
+            else:
+                asiento = Asiento.objects.create(
+                    codigo=vuelo,
+                    asiento_numero=asiento_numero,
+                    reservado=reservado,
+                    usuario_reservado=None
+                )
+                usuario = None
+
+            if usuario:
+                send_mail(
+                    'Reserva de asiento',
+                    f'Hola {usuario.nombre}, se te ha asignado el asiento {asiento.asiento_numero} en el vuelo {vuelo.codigo}.',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [usuario.correo],
+                    fail_silently=True
+                )
+
+            messages.success(request, 'Asiento creado o actualizado exitosamente.')
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
         return redirect('manage_seats')
-
-    vuelos = Vuelos.objects.all()
-    usuarios = Usuario.objects.all()
-    return render(request, 'paneladmin/form_seat.html', {
-        'vuelos': vuelos,
-        'usuarios': usuarios,
-        'titulo': 'Crear Asiento'
-    })
-
 
 def edit_seat_view(request, seat_id):
     asiento = get_object_or_404(Asiento, id=seat_id)
@@ -295,27 +322,53 @@ def edit_seat_view(request, seat_id):
             asiento.codigo = vuelo
             asiento.asiento_numero = request.POST.get('asiento_numero')
             asiento.reservado = request.POST.get('reservado') == 'on'
-            usuario_id = request.POST.get('usuario_reservado')
-            asiento.usuario_reservado_id = usuario_id if usuario_id else None
+            usuario_id = request.POST.get('usuario_reservado') or None
+            asiento.usuario_reservado_id = usuario_id
             asiento.save()
+
+            usuario = Usuario.objects.filter(id_usuario=usuario_id).first() if usuario_id else None
+            if usuario:
+                send_mail(
+                    'Asiento modificado',
+                    f'Hola {usuario.nombre}, tu asiento ha sido actualizado a {asiento.asiento_numero} en el vuelo {asiento.codigo.codigo}.',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [usuario.correo],
+                    fail_silently=True
+                )
+
             messages.success(request, 'Asiento actualizado exitosamente.')
+            return redirect('manage_seats')
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
-        return redirect('manage_seats')
+            return redirect('manage_seats')
 
     vuelos = Vuelos.objects.all()
     usuarios = Usuario.objects.all()
-    return render(request, 'paneladmin/form_seat.html', {
+    return render(request, 'paneladmin/edit_seat.html', {
         'asiento': asiento,
         'vuelos': vuelos,
         'usuarios': usuarios,
         'titulo': 'Editar Asiento'
     })
 
-
 def delete_seat_view(request, seat_id):
     asiento = get_object_or_404(Asiento, id=seat_id)
     if request.method == 'POST':
-        asiento.delete()
-        messages.success(request, 'Asiento eliminado.')
+        usuario = asiento.usuario_reservado
+        # En lugar de eliminar el asiento, solo quitar la asignación:
+        asiento.usuario_reservado = None
+        asiento.reservado = False
+        asiento.save()
+
+        if usuario:
+            send_mail(
+                'Asignación de asiento eliminada',
+                f'Hola {usuario.nombre}, la asignación del asiento que tenías reservado ha sido eliminada.',
+                settings.DEFAULT_FROM_EMAIL,
+                [usuario.correo],
+                fail_silently=True
+            )
+
+        messages.success(request, 'Asignación del asiento eliminada correctamente.')
     return redirect('manage_seats')
+

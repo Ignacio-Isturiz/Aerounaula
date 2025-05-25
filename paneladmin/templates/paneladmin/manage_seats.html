@@ -88,7 +88,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Vuelo</label>
-            <select name="codigo_id" class="form-select" required>
+            <select name="vuelo_codigo" class="form-select" required>
               {% for vuelo in vuelos %}
               <option value="{{ vuelo.codigo }}">{{ vuelo.origen }} → {{ vuelo.destino }} ({{ vuelo.codigo }})</option>
               {% endfor %}
@@ -96,7 +96,20 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Número de Asiento</label>
-            <input type="number" name="asiento_numero" class="form-control" required>
+            <input type="text" name="asiento_numero" class="form-control" pattern="[A-Z][0-9]{1,2}" title="Ejemplo: A1, B12" required>
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" name="reservado" class="form-check-input" id="createReservado">
+            <label for="createReservado" class="form-check-label">Reservado</label>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Usuario</label>
+            <select name="usuario_reservado" class="form-select">
+              <option value="">--- Ninguno ---</option>
+              {% for usuario in usuarios %}
+                <option value="{{ usuario.id_usuario }}">{{ usuario.nombre }} ({{ usuario.correo }})</option>
+              {% endfor %}
+            </select>
           </div>
         </div>
         <div class="modal-footer">
@@ -123,14 +136,29 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Número de Asiento</label>
-            <input type="number" name="asiento_numero" value="{{ asiento.asiento_numero }}" class="form-control" required>
+            <input type="text" name="asiento_numero" class="form-control" pattern="[A-Z][0-9]{1,2}" title="Ejemplo: A1, B12" required value="{{ asiento.asiento_numero }}">
           </div>
           <div class="mb-3">
             <label class="form-label">Vuelo</label>
-            <select name="codigo_id" class="form-select" required>
+            <select name="vuelo_codigo" class="form-select" required>
               {% for vuelo in vuelos %}
-              <option value="{{ vuelo.codigo }}" {% if vuelo.codigo == asiento.codigo.codigo %}selected{% endif %}>
+              <option value="{{ vuelo.codigo }}" {% if asiento.codigo.codigo == vuelo.codigo %}selected{% endif %}>
                 {{ vuelo.origen }} → {{ vuelo.destino }} ({{ vuelo.codigo }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" name="reservado" class="form-check-input" id="editReservado{{ asiento.id }}" {% if asiento.reservado %}checked{% endif %}>
+            <label for="editReservado{{ asiento.id }}" class="form-check-label">Reservado</label>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Usuario</label>
+            <select name="usuario_reservado" class="form-select">
+              <option value="">--- Ninguno ---</option>
+              {% for usuario in usuarios %}
+              <option value="{{ usuario.id_usuario }}" {% if asiento.usuario_reservado and asiento.usuario_reservado.id_usuario == usuario.id_usuario %}selected{% endif %}>
+                {{ usuario.nombre }} ({{ usuario.correo }})
               </option>
               {% endfor %}
             </select>
@@ -156,7 +184,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <p>¿Estás seguro que deseas eliminar este asiento?</p>
+          <p>¿Estás seguro que deseas eliminar esta asignacion?</p>
           <div class="alert alert-danger">
             Esta acción no se puede deshacer.
           </div>
@@ -183,7 +211,6 @@ document.addEventListener("DOMContentLoaded", function () {
       row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? "" : "none";
     });
 
-    // Número de fila (índice)
     rows.forEach((row, index) => {
       if (row.style.display !== "none") {
         row.querySelector(".index").textContent = index + 1;
