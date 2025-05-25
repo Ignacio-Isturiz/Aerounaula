@@ -343,7 +343,12 @@ def confirmar_asientos(request):
         asiento.usuario_reservado = usuario
         asiento.save()
 
-    Reserva.objects.create(id_usuario=usuario, vuelo=vuelo)
+    reserva, created = Reserva.objects.get_or_create(
+    id_usuario=usuario,
+    vuelo=vuelo,
+    defaults={'fecha_reserva': timezone.now()}
+)
+
 
     # Enviar el correo de confirmación
     send_mail(
