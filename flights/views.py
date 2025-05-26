@@ -16,6 +16,7 @@ from io import BytesIO
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
+from django.core.paginator import Paginator
 
 def generar_pdf_tiquetes(usuario, vuelo, resumen_asientos):
     buffer = BytesIO()
@@ -74,7 +75,7 @@ def vuelos_view(request):
     origen = request.GET.get('origen')
     destino = request.GET.get('destino')
     codigo = request.GET.get('codigo')
-    fecha_salida = request.GET.get('fecha_salida')
+    fecha_ida = request.GET.get('fecha_ida')
 
     vuelos = Vuelos.objects.filter(estado='Disponible')
     if origen:
@@ -83,15 +84,19 @@ def vuelos_view(request):
         vuelos = vuelos.filter(destino=destino)
     if codigo:
         vuelos = vuelos.filter(codigo=codigo)
-    if fecha_salida:
-        vuelos = vuelos.filter(fecha_salida__date=fecha_salida)
+    if fecha_ida:
+        vuelos = vuelos.filter(fecha_salida__date=fecha_ida)
+        
+    paginator = Paginator(vuelos, 5)
+    page_number = request.GET.get('page')
+    vuelos_paginados = paginator.get_page(page_number)
 
     # Determinar si el usuario está logueado
-    usuario_rol = request.session.get('usuario_rol')  # Puede ser None si no ha iniciado sesión
+    usuario_rol = request.session.get('usuario_rol') 
     usuario_nombre = request.session.get('usuario_nombre', '')
 
     return render(request, 'vuelos.html', {
-        'vuelos': vuelos,
+        'vuelos': vuelos_paginados,
         'origenes': origenes,
         'destinos': destinos,
         'codigos': codigos,

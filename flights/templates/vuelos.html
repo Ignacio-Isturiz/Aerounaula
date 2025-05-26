@@ -173,7 +173,7 @@
             <ul class="pagination custom-pagination">
                 {% if vuelos.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ vuelos.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Anterior</a>
+                        <a class="page-link" href="?page={{ vuelos.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> <</a>
                     </li>
                 {% endif %}
 
@@ -189,7 +189,7 @@
 
                 {% if vuelos.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ vuelos.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Siguiente</a>
+                        <a class="page-link" href="?page={{ vuelos.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> > </a>
                     </li>
                 {% endif %}
             </ul>

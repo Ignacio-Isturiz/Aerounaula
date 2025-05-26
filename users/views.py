@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.template.loader import render_to_string
 from dbmodels.models.usuario import Usuario, Rol
+from dbmodels.models.vuelos import Vuelos
 from .forms import LoginForm, RegistroForm, RecuperarClaveForm, RestablecerClaveForm
 from django.utils.timezone import make_aware
 from django.http import HttpResponseRedirect
@@ -140,11 +141,19 @@ def confirmar_cuenta(request, token):
 def dashboard(request):
     usuario_id = request.session.get('usuario_id')
     usuario_nombre = request.session.get('usuario_nombre')
+    usuario_rol = request.session.get('usuario_rol')
+
+    # Extraer ciudades únicas de origen y destino
+    origenes = Vuelos.objects.values_list('origen', flat=True).distinct()
+    destinos = Vuelos.objects.values_list('destino', flat=True).distinct()
 
     context = {
         'logueado': bool(usuario_id),
         'usuario_nombre': usuario_nombre,
-        'ocultar_navbar': False
+        'usuario_rol': usuario_rol,
+        'origenes': origenes,
+        'destinos': destinos,
+        'ocultar_navbar': False,
     }
 
     response = render(request, 'usuarios/dashboard.html', context)

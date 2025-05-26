@@ -19,163 +19,48 @@
     </div>
 </div>
 
-{# Nueva sección de búsqueda de vuelos (basada en la tercera imagen) #}
 <div class="container my-5" id="flight-search-section">
-    <h2 class="text-center mb-4">Encuentra tu próximo vuelo</h2>
-    <div class="flight-search-card p-4 p-md-5 mx-auto">
-        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="pills-ida-vuelta-tab" data-bs-toggle="pill" data-bs-target="#pills-ida-vuelta" type="button" role="tab" aria-controls="pills-ida-vuelta" aria-selected="true">Ida y vuelta</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-solo-ida-tab" data-bs-toggle="pill" data-bs-target="#pills-solo-ida" type="button" role="tab" aria-controls="pills-solo-ida" aria-selected="false">Solo ida</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-multidestino-tab" data-bs-toggle="pill" data-bs-target="#pills-multidestino" type="button" role="tab" aria-controls="pills-multidestino" aria-selected="false">Multidestino</button>
-            </li>
-        </ul>
-        <div class="tab-content" id="pills-tabContent">
-            {# Contenido para Ida y vuelta #}
-            <div class="tab-pane fade show active" id="pills-ida-vuelta" role="tabpanel" aria-labelledby="pills-ida-vuelta-tab">
-                <div class="row g-3 mb-4">
-                    <div class="col-12 col-md-6">
-                        <label for="origen_ida_vuelta" class="form-label visually-hidden">Origen</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                            <select class="form-select" id="origen_ida_vuelta" name="origen" required>
-                                <option selected disabled>Selecciona origen</option>
-                                <option value="ciudad1">Ciudad 1</option>
-                                <option value="ciudad2">Ciudad 2</option>
-                                </select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label for="destino_ida_vuelta" class="form-label visually-hidden">Destino</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-geo"></i></span>
-                            <select class="form-select" id="destino_ida_vuelta" name="destino" required>
-                                <option selected disabled>Selecciona destino</option>
-                                <option value="destino1">Destino 1</option>
-                                <option value="destino2">Destino 2</option>
-                                </select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label for="fecha_ida_ida_vuelta" class="form-label visually-hidden">Fecha de ida</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
-                            <input type="date" class="form-control" id="fecha_ida_ida_vuelta" name="fecha_ida" placeholder="dd/mm/aaaa" required>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label for="fecha_vuelta_ida_vuelta" class="form-label visually-hidden">Fecha de vuelta</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
-                            <input type="date" class="form-control" id="fecha_vuelta_ida_vuelta" name="fecha_vuelta" placeholder="dd/mm/aaaa">
-                        </div>
-                    </div>
+    <div class="bg-white shadow rounded-4 p-4 mx-auto" style="max-width: 700px;">
+        <h2 class="text-center fw-bold mb-4">Busca tu próximo vuelo</h2>
+        <form method="GET" action="{% url 'vuelos' %}">
+            <div class="row g-3 align-items-end">
+                <!-- Origen -->
+                <div class="col-md-4">
+                    <label for="origen" class="form-label fw-semibold"><i class="bi bi-geo-alt-fill"></i> Origen</label>
+                    <select class="form-select" id="origen" name="origen" >
+                        <option value="">Ciudad origen</option>
+                        {% for ciudad in origenes %}
+                            <option value="{{ ciudad }}">{{ ciudad }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <div class="row g-3 mb-4">
-                    <div class="col-12 col-md-6">
-                        <label for="pasajeros_ida_vuelta" class="form-label visually-hidden">Pasajeros</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <select class="form-select" id="pasajeros_ida_vuelta" name="pasajeros" required>
-                                <option selected disabled>Pasajeros</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5+</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label for="clase_ida_vuelta" class="form-label visually-hidden">Clase</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-tag"></i></span>
-                            <select class="form-select" id="clase_ida_vuelta" name="clase" required>
-                                <option selected disabled>Selecciona clase</option>
-                                <option value="economica">Económica</option>
-                                <option value="business">Business</option>
-                                <option value="primera">Primera</option>
-                            </select>
-                        </div>
-                    </div>
+                <!-- Destino -->
+                <div class="col-md-4">
+                    <label for="destino" class="form-label fw-semibold"><i class="bi bi-geo-fill"></i> Destino</label>
+                    <select class="form-select" id="destino" name="destino" >
+                        <option value="">Destino</option>
+                        {% for ciudad in destinos %}
+                            <option value="{{ ciudad }}">{{ ciudad }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <button type="submit" class="btn btn-primary btn-lg w-100">Buscar vuelos</button>
+                <!-- Fecha de ida -->
+                <div class="col-md-4">
+                    <label for="fecha_ida" class="form-label fw-semibold"><i class="bi bi-calendar-date-fill"></i> Fecha de ida</label>
+                    <input type="date" class="form-control" id="fecha_ida" name="fecha_ida">
+                </div>
             </div>
-
-            {# Contenido para Solo ida (puedes duplicar y adaptar el de Ida y vuelta) #}
-            <div class="tab-pane fade" id="pills-solo-ida" role="tabpanel" aria-labelledby="pills-solo-ida-tab">
-                <div class="row g-3 mb-4">
-                    <div class="col-12 col-md-6">
-                        <label for="origen_solo_ida" class="form-label visually-hidden">Origen</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                            <select class="form-select" id="origen_solo_ida" name="origen" required>
-                                <option selected disabled>Selecciona origen</option>
-                                <option value="ciudad1">Ciudad 1</option>
-                                <option value="ciudad2">Ciudad 2</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label for="destino_solo_ida" class="form-label visually-hidden">Destino</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-geo"></i></span>
-                            <select class="form-select" id="destino_solo_ida" name="destino" required>
-                                <option selected disabled>Selecciona destino</option>
-                                <option value="destino1">Destino 1</option>
-                                <option value="destino2">Destino 2</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label for="fecha_ida_solo_ida" class="form-label visually-hidden">Fecha de ida</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
-                            <input type="date" class="form-control" id="fecha_ida_solo_ida" name="fecha_ida" placeholder="dd/mm/aaaa" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="row g-3 mb-4">
-                    <div class="col-12 col-md-6">
-                        <label for="pasajeros_solo_ida" class="form-label visually-hidden">Pasajeros</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <select class="form-select" id="pasajeros_solo_ida" name="pasajeros" required>
-                                <option selected disabled>Pasajeros</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label for="clase_solo_ida" class="form-label visually-hidden">Clase</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-tag"></i></span>
-                            <select class="form-select" id="clase_solo_ida" name="clase" required>
-                                <option selected disabled>Selecciona clase</option>
-                                <option value="economica">Económica</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary btn-lg w-100">Buscar vuelos</button>
+            <!-- Botón -->
+            <div class="mt-4 text-center">
+                <button type="submit" class="btn btn-primary btn-lg w-100">
+                    <i class="bi bi-search"></i> Buscar vuelos
+                </button>
             </div>
-
-            {# Contenido para Multidestino (puedes adaptar para múltiples segmentos) #}
-            <div class="tab-pane fade" id="pills-multidestino" role="tabpanel" aria-labelledby="pills-multidestino-tab">
-                <p>Aquí puedes añadir un formulario para búsquedas multidestino.</p>
-                <button type="submit" class="btn btn-primary btn-lg w-100">Buscar vuelos multidestino</button>
-            </div>
-        </div>
+        </form>
     </div>
 </div>
 
-
-      <hr class="my-4">
+<hr class="my-4">
 <div class="container mt-5">
 
     {# Sección: ¿Por qué elegir Aerounaula? #}
