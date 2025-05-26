@@ -105,70 +105,6 @@ def vuelos_view(request):
         'ocultar_navbar': False
     })
 
-
-def crear_vuelo(request):
-    if request.method == 'POST':
-        fecha_salida_str = request.POST['fecha_salida']
-        fecha_salida = parse_datetime(fecha_salida_str)
-
-        if fecha_salida is None:
-            messages.error(request, "Formato de fecha inválido.")
-            return redirect('vuelos')
-
-        if timezone.is_naive(fecha_salida):
-            fecha_salida = make_aware(fecha_salida)
-
-        if fecha_salida < now():
-            messages.error(request, "No puedes crear un vuelo con una fecha pasada.")
-            return redirect('vuelos')
-
-        Vuelos.objects.create(
-            origen=request.POST['origen'],
-            destino=request.POST['destino'],
-            fecha_salida=fecha_salida,
-            precio=request.POST['precio'],
-            estado=request.POST.get('estado', ''),
-            imagen_url=request.POST.get('imagen_url', '')
-        )
-        return redirect('vuelos')
-
-    return render(request, 'crear.html', {'vuelo': None})
-
-def editar_vuelo(request, codigo):
-    vuelo = get_object_or_404(Vuelos, codigo=codigo)
-
-    if request.method == 'POST':
-        fecha_salida_str = request.POST['fecha_salida']
-        fecha_salida = parse_datetime(fecha_salida_str)
-
-        if fecha_salida is None:
-            messages.error(request, "Formato de fecha inválido.")
-            return redirect('vuelos')
-
-        if timezone.is_naive(fecha_salida):
-            fecha_salida = make_aware(fecha_salida)
-
-        if fecha_salida < now():
-            messages.error(request, "No puedes establecer una fecha pasada para este vuelo.")
-            return redirect('vuelos')
-
-        vuelo.origen = request.POST['origen']
-        vuelo.destino = request.POST['destino']
-        vuelo.fecha_salida = fecha_salida
-        vuelo.precio = request.POST['precio']
-        vuelo.estado = request.POST.get('estado', '')
-        vuelo.imagen_url = request.POST.get('imagen_url', '')
-        vuelo.save()
-        return redirect('vuelos')
-
-    return render(request, 'crear.html', {'vuelo': vuelo})
-
-def eliminar_vuelo(request, codigo):
-    vuelo = get_object_or_404(Vuelos, codigo=codigo)
-    if request.method == 'POST':
-        vuelo.delete()
-    return redirect('vuelos')
-
 def reservar_vuelo(request, codigo):
     if not request.session.get('usuario_id'):
         return redirect('login')
@@ -218,66 +154,78 @@ def asignar_asientos(request, codigo):
     if not Reserva.objects.filter(id_usuario=usuario_id, vuelo=vuelo).exists():
         return redirect('mis_reservas')
 
-    # Obtener los asientos disponibles para el vuelo
-    asientos = Asiento.objects.filter(codigo=vuelo).order_by('asiento_numero')
+    # Obtener datos del usuario y asientos
     usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
+    asientos = Asiento.objects.filter(codigo=vuelo).order_by('asiento_numero')
     asientos_usuario = asientos.filter(usuario_reservado=usuario)  # Asientos ya reservados por el usuario
     disponibles = asientos.filter(reservado=False)  # Asientos disponibles
 
     if request.method == 'POST':
-        # Obtener los asientos seleccionados por el usuario
-        seleccionados_ids = list(map(int, request.POST.getlist('asientos')))
-
-        # Filtrar los asientos seleccionados y verificar si están disponibles
-        nuevos = asientos.filter(id__in=seleccionados_ids, reservado=False)
-
-        if not nuevos:
-            messages.error(request, "No hay asientos disponibles o seleccionados.")
+        asientos_seleccionados_str = request.POST.get('asientos_seleccionados', '')
+        if not asientos_seleccionados_str:
+            messages.error(request, "No se seleccionaron asientos.")
             return redirect('asignar_asientos', codigo=vuelo.codigo)
 
-        # Crear una lista para almacenar el resumen de los precios
-        resumen_asientos = []
+        # Parsear el string "id:tipo,id:tipo,..."
+        seleccionados = {}
+        for item in asientos_seleccionados_str.split(','):
+            if ':' in item:
+                asiento_id_str, tipo_pasajero = item.split(':', 1)
+                try:
+                    asiento_id = int(asiento_id_str)
+                except ValueError:
+                    messages.error(request, "Datos de asientos inválidos.")
+                    return redirect('asignar_asientos', codigo=vuelo.codigo)
+                seleccionados[asiento_id] = tipo_pasajero
+            else:
+                messages.error(request, "Formato de asientos inválido.")
+                return redirect('asignar_asientos', codigo=vuelo.codigo)
 
+        # Filtrar los asientos seleccionados y verificar disponibilidad
+        nuevos = Asiento.objects.filter(id__in=seleccionados.keys(), reservado=False)
+        if nuevos.count() != len(seleccionados):
+            messages.error(request, "Uno o más asientos seleccionados no están disponibles.")
+            return redirect('asignar_asientos', codigo=vuelo.codigo)
+
+        # Crear resumen de precios
+        resumen_asientos = []
         for asiento in nuevos:
-            tipo_pasajero = request.POST.get(f'tipo_pasajero_{asiento.id}')
-            
-            # Validación del tipo de pasajero
+            tipo_pasajero = seleccionados.get(asiento.id)
             if tipo_pasajero not in ['nino', 'persona_mayor', 'adulto']:
                 messages.error(request, "Tipo de pasajero inválido.")
                 return redirect('asignar_asientos', codigo=vuelo.codigo)
-            
-            # Calcular el precio final según el tipo de pasajero
+
             precio = Decimal(vuelo.precio)
             if tipo_pasajero == 'nino':
-                descuento = Decimal(0.20)  # 20% de descuento para niño
+                descuento = Decimal('0.20')
             elif tipo_pasajero == 'persona_mayor':
-                descuento = Decimal(0.15)  # 15% de descuento para persona mayor
+                descuento = Decimal('0.15')
             else:
-                descuento = Decimal(0.00)  # No descuento para adulto
+                descuento = Decimal('0.00')
 
             precio_final = precio - (precio * descuento)
 
-            # Agregar el resumen del asiento con su precio final
             resumen_asientos.append({
                 'asiento': asiento.asiento_numero,
                 'tipo_pasajero': tipo_pasajero,
-                'precio': float(precio_final)  # Convertir a float para usar en la plantilla
+                'precio': float(precio_final)
             })
 
-        # Guardar la información del resumen en la sesión para usarla en el siguiente paso
+        # Guardar en sesión
         request.session['resumen_asientos'] = resumen_asientos
-        request.session['seleccionados_ids'] = seleccionados_ids
+        request.session['seleccionados_ids'] = list(seleccionados.keys())
         request.session['vuelo_codigo'] = vuelo.codigo
 
-        # Redirigir a la página de confirmación
         return redirect('confirmar_asientos')
 
+    # GET: Mostrar la plantilla
     return render(request, 'asignar_asientos.html', {
         'vuelo': vuelo,
         'asientos': asientos,
         'disponibles': disponibles,
-        'asientos_usuario': asientos_usuario
+        'asientos_usuario': asientos_usuario,
     })
+
 
 def mis_asientos(request):
     if not request.session.get('usuario_id'):

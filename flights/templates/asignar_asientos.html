@@ -2,35 +2,134 @@
 {% block content %}
 
 <h2>Asignar Asientos</h2>
-<form method="post">
+
+<form method="post" id="form-asientos">
     {% csrf_token %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Seleccionar</th>
-                <th>Asiento</th>
-                <th>Tipo de pasajero</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for asiento in disponibles %}
-            <tr>
-                <td>
-                    <input type="checkbox" name="asientos" value="{{ asiento.id }}" id="asiento_{{ asiento.id }}">
-                </td>
-                <td>{{ asiento.asiento_numero }}</td>
-                <td>
-                    <select name="tipo_pasajero_{{ asiento.id }}" class="form-control">
-                        <option value="adulto">Adulto</option>
-                        <option value="nino">Niño</option>
-                        <option value="persona_mayor">Persona Mayor</option>
-                    </select>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+   <div style="display: flex; justify-content: center; margin-top: 20px;">
+    <div class="seats-container" style="display: flex; flex-wrap: wrap; gap: 8px; max-width: 300px;">
+        {% for asiento in disponibles %}
+        <button type="button" 
+                class="seat-button" 
+                data-asiento-id="{{ asiento.id }}" 
+                data-asiento-num="{{ asiento.asiento_numero }}"
+                style="width: 50px; height: 50px; border-radius: 50%; background-color: #eee; border: 2px solid #999; font-weight: bold;">
+            {{ asiento.asiento_numero }}
+        </button>
+        {% endfor %}
+    </div>
+</div>
+
+    <input type="hidden" name="asientos_seleccionados" id="asientos_seleccionados" />
+
     <button type="submit" class="btn btn-primary">Calcular y Confirmar</button>
 </form>
+
+<!-- Modal para seleccionar tipo de pasajero -->
+<div class="modal fade" id="tipoPasajeroModal" tabindex="-1" aria-labelledby="tipoPasajeroModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="tipoPasajeroModalLabel">Selecciona tipo de pasajero</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>Asiento <span id="modalAsientoNum"></span></p>
+        <select id="selectTipoPasajero" class="form-select">
+          <option value="adulto">Adulto</option>
+          <option value="nino">Niño</option>
+          <option value="persona_mayor">Persona Mayor</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btnGuardarTipo" class="btn btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts Bootstrap 5 (si no los tienes ya) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const seatButtons = document.querySelectorAll('.seat-button');
+    const modal = new bootstrap.Modal(document.getElementById('tipoPasajeroModal'));
+    const modalAsientoNum = document.getElementById('modalAsientoNum');
+    const selectTipoPasajero = document.getElementById('selectTipoPasajero');
+    const btnGuardarTipo = document.getElementById('btnGuardarTipo');
+    const hiddenInput = document.getElementById('asientos_seleccionados');
+
+    // Objeto para almacenar selección: { asiento_id: tipo_pasajero }
+    let seleccionados = {};
+
+    let asientoActualId = null;
+
+    // Cuando clicas un botón
+    seatButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const asientoId = button.dataset.asientoId;
+            const asientoNum = button.dataset.asientoNum;
+
+            // Si el asiento ya está seleccionado, lo deseleccionamos y borramos del objeto
+            if(seleccionados[asientoId]) {
+                delete seleccionados[asientoId];
+                button.style.backgroundColor = '#eee';
+                button.style.color = '#000';
+            } else {
+                // Abrimos modal para elegir tipo pasajero
+                asientoActualId = asientoId;
+                modalAsientoNum.textContent = asientoNum;
+                selectTipoPasajero.value = 'adulto'; // valor por defecto
+                modal.show();
+            }
+        });
+    });
+
+    // Guardar tipo pasajero en el modal
+    btnGuardarTipo.addEventListener('click', () => {
+        if(asientoActualId) {
+            const tipo = selectTipoPasajero.value;
+
+            // Guardamos selección
+            seleccionados[asientoActualId] = tipo;
+
+            // Cambiamos estilo del botón para mostrar que está seleccionado
+            const button = document.querySelector(`.seat-button[data-asiento-id="${asientoActualId}"]`);
+            button.style.backgroundColor = '#007bff';
+            button.style.color = '#fff';
+
+            // Cerramos modal
+            modal.hide();
+
+            asientoActualId = null;
+
+            // Actualizamos input hidden para enviar al backend
+            // Formato: "id1:tipo1,id2:tipo2,..."
+            const valorInput = Object.entries(seleccionados)
+                                     .map(([id, tipo]) => `${id}:${tipo}`)
+                                     .join(',');
+            hiddenInput.value = valorInput;
+        }
+    });
+
+    // Si quieres evitar que se seleccione más de un asiento a la vez, aquí puedes agregar lógica adicional
+
+});
+</script>
+
+<style>
+.seat-button {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+.seat-button:hover {
+    background-color: #b3d7ff;
+}
+</style>
 
 {% endblock %}

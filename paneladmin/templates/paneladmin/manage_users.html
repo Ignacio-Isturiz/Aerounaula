@@ -114,62 +114,70 @@
   </div>
 
   <!-- Modales para Editar/Eliminar (uno por usuario) -->
-  {% for usuario in usuarios %}
-  <!-- Modal Editar Usuario -->
-  <div class="modal fade" id="editUserModal{{ usuario.id_usuario }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Editar Usuario #{{ usuario.id_usuario }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form method="POST" action="{% url 'edit_user' usuario.id_usuario %}">
-          <div class="modal-body">
-            <div class="row">
-              <div class="col mb-3">
-                <label for="nombre{{ usuario.id_usuario }}" class="form-label">Nombre</label>
-                <input type="text" id="nombre{{ usuario.id_usuario }}" name="nombre" 
-                       class="form-control" value="{{ usuario.nombre }}" required>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col mb-3">
-                <label for="correo{{ usuario.id_usuario }}" class="form-label">Correo</label>
-                <input type="email" id="correo{{ usuario.id_usuario }}" name="correo" 
-                       class="form-control" value="{{ usuario.correo }}" required>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col mb-3">
-                <label for="id_rol{{ usuario.id_usuario }}" class="form-label">Rol</label>
-                <select id="id_rol{{ usuario.id_usuario }}" name="id_rol" class="form-select">
-                  {% for rol in roles %}
-                  <option value="{{ rol.id_rol }}" {% if usuario.id_rol_id == rol.id_rol %}selected{% endif %}>
-                    {{ rol.nombrerol }}
-                  </option>
-                  {% endfor %}
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col mb-3">
-                <label class="form-label">Estado</label>
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" id="estado{{ usuario.id_usuario }}" 
-                         name="estado" {% if usuario.estado %}checked{% endif %}>
-                  <label class="form-check-label" for="estado{{ usuario.id_usuario }}">Activo</label>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-          </div>
-        </form>
+{% for usuario in usuarios %}
+<!-- Modal Editar Usuario -->
+<div class="modal fade" id="editUserModal{{ usuario.id_usuario }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Usuario #{{ usuario.id_usuario }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
+      <form method="POST" action="{% url 'edit_user' usuario.id_usuario %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row">
+            <div class="col mb-3">
+              <label for="nombre{{ usuario.id_usuario }}" class="form-label">Nombre</label>
+              <input type="text" id="nombre{{ usuario.id_usuario }}" name="nombre" 
+                     class="form-control" value="{{ usuario.nombre }}" required>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col mb-3">
+              <label for="correo{{ usuario.id_usuario }}" class="form-label">Correo</label>
+              <input type="email" id="correo{{ usuario.id_usuario }}" name="correo" 
+                     class="form-control" value="{{ usuario.correo }}" required>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col mb-3">
+              <label for="id_rol{{ usuario.id_usuario }}" class="form-label">Rol</label>
+              <select id="id_rol{{ usuario.id_usuario }}" name="id_rol" class="form-select" required>
+                {% for rol in roles %}
+                <option value="{{ rol.id_rol }}" {% if usuario.id_rol_id == rol.id_rol %}selected{% endif %}>
+                  {{ rol.nombrerol }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col mb-3">
+              <label class="form-label">Estado</label>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="estado{{ usuario.id_usuario }}" 
+                       name="estado" {% if usuario.estado %}checked{% endif %}>
+                <label class="form-check-label" for="estado{{ usuario.id_usuario }}">Activo</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+
     </div>
   </div>
+</div>
 
   <!-- Modal Eliminar Usuario -->
   <div class="modal fade" id="deleteUserModal{{ usuario.id_usuario }}" tabindex="-1" aria-hidden="true">

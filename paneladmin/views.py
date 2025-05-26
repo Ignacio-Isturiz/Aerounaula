@@ -125,7 +125,6 @@ def create_flight_view(request):
     if request.method == 'POST':
         try:
             Vuelos.objects.create(
-                codigo=request.POST.get('codigo'),
                 origen=request.POST.get('origen'),
                 destino=request.POST.get('destino'),
                 fecha_salida=request.POST.get('fecha_salida'),
