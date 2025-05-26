@@ -67,9 +67,6 @@ def descargar_tiquetes_pdf(request):
 
 
 def vuelos_view(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
-
     origenes = Vuelos.objects.values_list('origen', flat=True).distinct()
     destinos = Vuelos.objects.values_list('destino', flat=True).distinct()
     codigos = Vuelos.objects.values_list('codigo', flat=True).distinct()
@@ -89,15 +86,20 @@ def vuelos_view(request):
     if fecha_salida:
         vuelos = vuelos.filter(fecha_salida__date=fecha_salida)
 
+    # Determinar si el usuario está logueado
+    usuario_rol = request.session.get('usuario_rol')  # Puede ser None si no ha iniciado sesión
+    usuario_nombre = request.session.get('usuario_nombre', '')
+
     return render(request, 'vuelos.html', {
         'vuelos': vuelos,
         'origenes': origenes,
         'destinos': destinos,
         'codigos': codigos,
-        'usuario_nombre': request.session.get('usuario_nombre'),
-        'usuario_rol': request.session.get('usuario_rol'),
+        'usuario_nombre': usuario_nombre,
+        'usuario_rol': usuario_rol,
         'ocultar_navbar': False
     })
+
 
 def crear_vuelo(request):
     if request.method == 'POST':

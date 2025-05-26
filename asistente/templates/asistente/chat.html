@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Asistente de Aerounaula</title>
+  <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <img src="https://img.icons8.com/emoji/48/robot-emoji.png" alt="Bot">
+      Asistente de Aerounaula
+    </div>
+
+    <div class="chat-body" id="chat-body">
+      {% if historial %}
+        {% for mensaje in historial %}
+          <div class="bubble user">{{ mensaje.user }}</div>
+
+          {% if forloop.last %}
+            <div class="bubble bot fade-hidden" id="bot-latest-response">{{ mensaje.bot }}</div>
+            <div class="bubble bot" id="typing-indicator">✈️ Escribiendo...</div>
+          {% else %}
+            <div class="bubble bot">{{ mensaje.bot }}</div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <div class="bubble bot">
+          {% if nombre_usuario %}
+            Hola <strong>{{ nombre_usuario }}</strong> 👋 ¿En qué puedo ayudarte hoy?<br>
+          {% else %}
+            ¡Hola! ¿En qué puedo ayudarte hoy?<br>
+          {% endif %}
+          Puedes preguntarme cosas como:<br>
+          <strong>“¿Qué vuelos hay desde Bogotá?”</strong>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="chat-footer">
+        <form id="chat-form">
+            {% csrf_token %}
+            <input type="text" name="mensaje" id="mensaje-input" placeholder="Escribe tu mensaje aquí..." required autocomplete="off">
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+  </div>
+
+  <script src="{% static 'js/chat.js' %}"></script>
+</body>
+</html>

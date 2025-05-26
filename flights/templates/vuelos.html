@@ -129,33 +129,35 @@
               <small class="text-muted">Precio por persona</small>
               <div class="fs-5 fw-bold text-primary mb-2">${{ vuelo.precio|floatformat:0|intcomma }}</div>
               {% if usuario_rol == "User" %}
-              <form method="post" action="{% url 'reservar_vuelo' vuelo.codigo %}">
+            <form method="post" action="{% url 'reservar_vuelo' vuelo.codigo %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary w-40">Reservar</button>
+            </form>
+          {% elif usuario_rol == "Admin" %}
+            <div class="admin-actions">
+              <button type="button" class="btn btn-outline-secondary btn-sm w-100 mb-1"
+                onclick="abrirModalEditar(this)"
+                data-id="{{ vuelo.codigo }}"
+                data-origen="{{ vuelo.origen|escapejs }}"
+                data-destino="{{ vuelo.destino|escapejs }}"
+                data-fecha="{{ vuelo.fecha_salida|date:'Y-m-d\\TH:i' }}"
+                data-precio="{{ vuelo.precio }}"
+                data-estado="{{ vuelo.estado|escapejs }}"
+                data-imagen="{{ vuelo.imagen_url|escapejs }}"
+                data-origen-code="{{ vuelo.origen_code|escapejs }}"
+                data-destino-code="{{ vuelo.destino_code|escapejs }}">
+                <i class="bi bi-pencil-square"></i> Editar
+              </button>
+              <form method="post" action="{% url 'eliminar_vuelo' vuelo.codigo %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary w-50">Reservar</button>
-              </form>
-              {% elif usuario_rol == "Admin" %}
-              <div class="admin-actions">
-                <button type="button" class="btn btn-outline-secondary btn-sm w-100 mb-1"
-                  onclick="abrirModalEditar(this)"
-                  data-id="{{ vuelo.codigo }}"
-                  data-origen="{{ vuelo.origen|escapejs }}"
-                  data-destino="{{ vuelo.destino|escapejs }}"
-                  data-fecha="{{ vuelo.fecha_salida|date:'Y-m-d\\TH:i' }}"
-                  data-precio="{{ vuelo.precio }}"
-                  data-estado="{{ vuelo.estado|escapejs }}"
-                  data-imagen="{{ vuelo.imagen_url|escapejs }}"
-                  data-origen-code="{{ vuelo.origen_code|escapejs }}"
-                  data-destino-code="{{ vuelo.destino_code|escapejs }}">
-                  <i class="bi bi-pencil-square"></i> Editar
+                <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                  <i class="bi bi-trash"></i> Eliminar
                 </button>
-                <form method="post" action="{% url 'eliminar_vuelo' vuelo.codigo %}">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-outline-danger btn-sm w-100">
-                    <i class="bi bi-trash"></i> Eliminar
-                  </button>
-                </form>
-              </div>
-              {% endif %}
+              </form>
+            </div>
+          {% else %}
+            <div class="text-muted small fst-italic">Inicia sesión para reservar</div>
+          {% endif %}
             </div>
           </div>
         </div>

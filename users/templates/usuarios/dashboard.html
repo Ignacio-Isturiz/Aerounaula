@@ -5,6 +5,7 @@
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -395,6 +396,13 @@
         </div>
     </div>
     {# Fin de la sección "Más información de interés" #}
+    <!-- Icono del botón (emoji 🤖 o puedes usar FontAwesome si deseas) -->
+    <button id="chatbot-button" title="Asistente IA">🤖</button>
+
+    <!-- Modal del chatbot -->
+    <div id="chatbot-modal">
+        <iframe id="chatbot-iframe" src="/asistente/chat/"></iframe>
+    </div>
 
 </div>
 {% endblock %}

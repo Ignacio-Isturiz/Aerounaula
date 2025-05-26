@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'dbmodels',
     'flights',
     'paneladmin',
+    'asistente',
 
     #Seguridad
     'axes',
@@ -78,6 +79,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+X_FRAME_OPTIONS = 'SAMEORIGIN' #permite abrir el iframe de la ia
 
 ROOT_URLCONF = 'Aerounaula.urls'
 
