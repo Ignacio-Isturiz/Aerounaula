@@ -31,18 +31,8 @@
                 </div>
                 <div class="col-md-2">
                     <label for="fecha_ida" class="form-label text-dark-emphasis mb-1"><i class="bi bi-calendar-check-fill"></i> Fecha de ida</label>
-                    <input type="date" name="fecha_salida" id="fecha_ida" class="form-control search-input" value="{{ request.GET.fecha_salida }}" >
+                    <input type="date" id="fecha_ida" name="fecha_ida" class="form-control">
                 </div>
-                <!-- <div class="col-md-2">
-                    <label for="pasajeros" class="form-label text-dark-emphasis mb-1"><i class="bi bi-person-fill"></i> Pasajeros</label>
-                    <select class="form-select search-input" name="pasajeros" id="pasajeros">
-                        <option value="1" {% if request.GET.pasajeros == '1' or not request.GET.pasajeros %}selected{% endif %}>1 pasajero</option>
-                        <option value="2" {% if request.GET.pasajeros == '2' %}selected{% endif %}>2 pasajeros</option>
-                        <option value="3" {% if request.GET.pasajeros == '3' %}selected{% endif %}>3 pasajeros</option>
-                        <option value="4" {% if request.GET.pasajeros == '4' %}selected{% endif %}>4 pasajeros</option>
-                        <option value="5" {% if request.GET.pasajeros == '5' %}selected{% endif %}>5 pasajeros</option>
-                    </select>
-                </div> -->
                  {% if usuario_rol %} {# Only show for admin/staff to filter by code #}
                  <div class="col-12 mt-3">
                     <label for="codigo_vuelo_admin" class="form-label text-dark-emphasis mb-1"><i class="bi bi-barcode"></i> Código de Vuelo</label>
@@ -173,5 +163,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/filtroVuelos.js' %}"></script>
 <script src="{% static 'js/vuelos.js' %}"></script>
 {% endblock %}

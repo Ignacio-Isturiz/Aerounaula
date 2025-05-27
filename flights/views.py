@@ -432,3 +432,6 @@ def confirmar_asientos(request):
 
 def info_equipaje(request):
     return render(request, 'informacion/equipaje.html')
+
+def sobre_nosotros(request):
+    return render(request, 'usuarios/sobre_nosotros.html')

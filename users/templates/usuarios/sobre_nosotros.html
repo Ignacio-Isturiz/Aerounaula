@@ -1,0 +1,76 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+
+{% block title %}Sobre Nosotros - Aerounaula{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/sobre_nosotros.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="hero-sobre-nosotros">
+    <div class="overlay"></div>
+    <div class="contenido">
+        <h1>Somos Aerounaula</h1>
+        <p>Volar con propósito, valores y confianza.</p>
+    </div>
+</section>
+
+<section class="valores">
+  <div class="container">
+    <h2>Nuestros Valores</h2>
+    <div class="grid-valores">
+
+      <div class="valor fade-in">
+        <img src="{% static 'images/sobreNosotros/valor_seguridad.jpg' %}" alt="Seguridad" class="valor-img">
+        <h4>Seguridad</h4>
+        <p>Tu bienestar es nuestra prioridad, en cada vuelo y destino.</p>
+      </div>
+
+      <div class="valor fade-in">
+        <img src="{% static 'images/sobreNosotros/valor_felicidad.jpg' %}" alt="Felicidad" class="valor-img">
+        <h4>Felicidad</h4>
+        <p>Creamos momentos alegres que se convierten en recuerdos inolvidables.</p>
+      </div>
+
+      <div class="valor fade-in">
+        <img src="{% static 'images/sobreNosotros/valor_confianza.jpg' %}" alt="Confianza" class="valor-img">
+        <h4>Confianza</h4>
+        <p>Construimos relaciones sólidas con nuestros pasajeros y colaboradores.</p>
+      </div>
+
+      <div class="valor fade-in">
+        <img src="{% static 'images/sobreNosotros/valor_experiencias.jpg' %}" alt="Experiencias" class="valor-img">
+        <h4>Experiencias</h4>
+        <p>No solo volamos, conectamos sueños y personas.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+<section class="transformacion-marca py-5">
+  <div class="container d-flex flex-column flex-lg-row align-items-center justify-content-center gap-5">
+    
+    <!-- Logo de Aerounaula -->
+    <div class="logo-box p-4 rounded">
+      <img src="{% static 'images/logo_aerounaula.jpg' %}" alt="Logo Aerounaula" class="img-fluid">
+    </div>
+
+    <!-- Texto institucional -->
+    <div class="texto-marca">
+      <h3><strong>Nuestra marca evoluciona</strong></h3>
+      <p>
+        Cambiar es avanzar. En Aerounaula creemos en una visión cercana, moderna y empática. Por eso, transformamos nuestra imagen con una nueva perspectiva para quienes nos acompañan hoy.
+      </p>
+      <p>
+        <strong>Estamos escribiendo una nueva historia</strong> contigo a bordo, mirando de frente, con calidez y honestidad. Queremos que cada vuelo sea una experiencia que inspire confianza.
+      </p>
+      <p>
+        Hoy abrimos nuestras alas para los que desean volar con propósito, porque <strong>el cielo es de todos</strong>. Bienvenido a Aerounaula: donde cada trayecto empieza con valores.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
