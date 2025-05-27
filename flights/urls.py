@@ -13,5 +13,4 @@ urlpatterns = [
     path('descargar-tiquetes/', views.descargar_tiquetes_pdf, name='descargar_tiquetes'),
     path('info/equipaje/', views.info_equipaje, name='info_equipaje'),
     path('sobre-nosotros/', views.sobre_nosotros, name='sobre_nosotros'),
-
 ]

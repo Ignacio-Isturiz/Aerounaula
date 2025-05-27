@@ -1,0 +1,50 @@
+
+/* Animaciones */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Contenedor principal */
+.container h2 {
+    font-weight: 700;
+    font-size: 2rem;
+    color: #212529;
+}
+
+.container p {
+    color: #555;
+}
+
+/* Tarjetas */
+.shadow-sm {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.shadow-sm:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.bg-white {
+    background-color: #fff !important;
+}
+
+ul {
+    padding-left: 1.2rem;
+}
+
+ul li {
+    margin-bottom: 0.5rem;
+}
+
+/* Imagenes */
+.img-fluid {
+    border-radius: 10px;
+}
