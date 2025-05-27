@@ -283,5 +283,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+// Evitar fechas pasadas en formularios de edición de vuelos
+document.addEventListener('DOMContentLoaded', function () {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  const minFecha = now.toISOString().slice(0, 16);
+
+  // Para crear vuelo
+  const fechaInput = document.getElementById("fecha_salida");
+  if (fechaInput) {
+    fechaInput.min = minFecha;
+  }
+
+  // Para edición de vuelos
+  const editInputs = document.querySelectorAll('input[type="datetime-local"][id^="fecha_salida"]');
+  editInputs.forEach(input => {
+    input.min = minFecha;
+  });
+});
 </script>
 {% endblock %}

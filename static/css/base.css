@@ -1,20 +1,32 @@
+/* Estructura principal */
 body {
     background-color: #f9f9f9;
-    min-height: 100vh; /* Asegura que el body ocupe al menos toda la altura de la ventana */
-    display: flex; /* Para que el footer se fije al final si el contenido es corto */
-    flex-direction: column; /* Para que el footer se fije al final si el contenido es corto */
+    min-height: 100vh;
 }
 
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    padding-top: 80px; /* Compensa altura del navbar fixed-top */
+}
+
+/* NAVBAR */
 .navbar-custom {
     background: #3b5895;
-    padding: 0.75rem 1.5rem; /* Permite que el padding se ajuste un poco si es necesario */
+    padding: 0.75rem 1.5rem;
+    border-bottom: none !important;
 }
 
 .navbar-logo {
     background-color: white;
     color: #3eb2fd;
     border-radius: 10px;
-    width: 30px; /* Tamaño fijo, adecuado para un logo pequeño */
+    width: 30px;
     height: 30px;
     display: flex;
     align-items: center;
@@ -25,45 +37,37 @@ body {
 .navbar-brand {
     color: white !important;
     font-weight: bold;
-    font-size: 1.5rem; /* Ajuste del tamaño de fuente con rem */
+    font-size: 1.5rem;
     text-decoration: none;
 }
 
 .nav-link {
     color: white !important;
     margin-right: 1rem;
-    padding: 0.5rem 0; /* Ajuste para mejor responsividad en nav-items */
+    padding: 0.5rem 0;
 }
 
 .nav-link.active {
-    font-weight: bold; /* Resalta el enlace activo */
-    border-bottom: 2px solid white; /* Indicador visual del enlace activo */
+    font-weight: bold;
+    border-bottom: 2px solid white;
 }
-
 
 .btn-outline-light {
     color: white;
     border-color: white;
-    transition: background-color 0.3s ease, color 0.3s ease; /* Transición suave para hover */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .btn-outline-light:hover {
-    background-color: white; /* Cambia a fondo blanco en hover */
-    color: #3b5895; /* Color del texto en hover */
-    border-color: white;
+    background-color: white;
+    color: #3b5895;
 }
 
-/* Contenido principal para que el footer no se superponga al navbar */
-.container {
-    flex: 1; /* Permite que el contenido principal ocupe el espacio restante */
-}
-
-
-/* Footer Styles */
+/* FOOTER */
 .footer-custom {
     background-color: #122443;
     color: white;
-    flex-shrink: 0; /* Evita que el footer se encoja si el contenido es mucho */
+    flex-shrink: 0;
 }
 
 .footer-logo {
@@ -83,59 +87,40 @@ body {
     height: 32px;
     border-radius: 50%;
     text-decoration: none;
-    transition: background-color 0.3s ease; /* Transición suave para hover */
+    transition: background-color 0.3s ease;
 }
 
 .footer-icon:hover {
     background-color: #1a1df8;
 }
 
-.navbar-toggler {
-    border: none;
-    padding: 0.25rem 0.75rem; /* Pequeño padding para el botón */
-}
-
-.navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='white' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-    width: 1.5em; /* Ajuste del tamaño del icono */
-    height: 1.5em;
-}
-
-/* Media Queries para ajustes finos si fuera necesario */
-@media (max-width: 991.98px) { /* Bootstrap's `lg` breakpoint: menor a 992px */
+/* Responsive */
+@media (max-width: 991.98px) {
     .navbar-nav .nav-item {
         margin-bottom: 0.5rem;
-    }
-    .navbar-nav {
-        padding-top: 1rem;
     }
     .btn-outline-light {
         margin-top: 1rem;
     }
     .dropdown {
-        margin-top: 1rem; /* Espacio para el dropdown en móviles */
+        margin-top: 1rem;
     }
     .footer-custom .container {
-        align-items: center; /* Centra los elementos del footer en pantallas pequeñas */
+        align-items: center;
     }
 }
 
-/* Ajustes para pantallas extra pequeñas */
-@media (max-width: 575.98px) { /* Bootstrap's `sm` breakpoint: menor a 576px */
+@media (max-width: 575.98px) {
     .container-fluid.px-sm-3.px-md-5 {
         padding-left: 1rem !important;
         padding-right: 1rem !important;
     }
     .navbar-brand {
-        font-size: 1.25rem; /* Reduce un poco el tamaño del logo en pantallas muy pequeñas */
+        font-size: 1.25rem;
     }
     .navbar-logo {
-        width: 25px; /* Reduce un poco el tamaño del icono del logo */
+        width: 25px;
         height: 25px;
         font-size: 0.9rem;
     }
-}
-
-body:not(.sin-navbar) {
-    padding-top: 70px;
 }
