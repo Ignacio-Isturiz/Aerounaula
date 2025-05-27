@@ -5,8 +5,6 @@ from dbmodels.models.reserva import Reserva
 from dbmodels.models.asiento import Asiento
 from dbmodels.models.usuario import Usuario
 from django.utils import timezone
-from django.utils.dateparse import parse_datetime
-from django.utils.timezone import make_aware, now
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
 from django.contrib import messages
@@ -14,19 +12,11 @@ from django.urls import reverse
 from decimal import Decimal
 from io import BytesIO
 from django.http import FileResponse
-from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from django.core.paginator import Paginator
-
-from io import BytesIO
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
-from io import BytesIO
-from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib import colors
 from reportlab.lib.units import inch
 
 def generar_pdf_tiquetes(usuario, vuelo, resumen_asientos):

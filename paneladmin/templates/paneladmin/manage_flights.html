@@ -10,7 +10,40 @@
   <!-- Card de Tabla de Vuelos -->
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-      <h5>Listado de Vuelos</h5>
+      <div class="card-body">
+  <form method="GET" class="row align-items-end gx-2 gy-2">
+    <div class="col-md-3">
+      <select name="origen" class="form-select">
+        <option value="">-- Origen --</option>
+        {% for o in origenes %}
+          <option value="{{ o }}" {% if filtros.origen == o %}selected{% endif %}>{{ o }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select name="destino" class="form-select">
+        <option value="">-- Destino --</option>
+        {% for d in destinos %}
+          <option value="{{ d }}" {% if filtros.destino == d %}selected{% endif %}>{{ d }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="estado" class="form-select">
+        <option value="">-- Estado --</option>
+        <option value="Disponible" {% if filtros.estado == 'Disponible' %}selected{% endif %}>Disponible</option>
+        <option value="Abordó" {% if filtros.estado == 'Abordó' %}selected{% endif %}>Abordó</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <input type="date" name="fecha_inicio" class="form-control" value="{{ filtros.fecha_inicio }}">
+    </div>
+    <div class="col-md-2 d-flex">
+      <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+      <a href="{% url 'manage_flights' %}" class="btn btn-secondary">Limpiar</a>
+    </div>
+  </form>
+</div>
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createFlightModal">
         <i class="bx bx-plus me-2"></i>Nuevo Vuelo
       </button>

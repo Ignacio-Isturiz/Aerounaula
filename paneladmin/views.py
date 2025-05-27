@@ -7,6 +7,8 @@ from django.contrib import messages
 from django.http import JsonResponse
 from Aerounaula import settings
 from django.core.mail import send_mail
+from unidecode import unidecode
+
 
 def panel_admin_view(request):
     rol = request.session.get('usuario_rol')  
@@ -109,17 +111,44 @@ def delete_user_view(request, user_id):
 
 #<------------------------------ gestion de vuelos----------------------------->
 
+def normalize(texto):
+    """Quitar tildes y poner en minúscula"""
+    return unidecode(texto).lower()
+
 def manage_flights_view(request):
     if request.session.get('usuario_rol') != 'Admin':
         return redirect('dashboard')
-    
-    vuelos = Vuelos.objects.all().order_by('fecha_salida')
-    
+
+    vuelos = Vuelos.objects.all()
+
+    # Obtener lista de origenes y destinos únicos
+    origenes = sorted(set(vuelos.values_list('origen', flat=True)))
+    destinos = sorted(set(vuelos.values_list('destino', flat=True)))
+
+    origen = request.GET.get('origen')
+    destino = request.GET.get('destino')
+    estado = request.GET.get('estado')
+
+    if origen:
+        vuelos = [v for v in vuelos if normalize(v.origen) == normalize(origen)]
+    if destino:
+        vuelos = [v for v in vuelos if normalize(v.destino) == normalize(destino)]
+    if estado:
+        vuelos = [v for v in vuelos if v.estado == estado]
+
     context = {
         'vuelos': vuelos,
-        'titulo': 'Gestión de Vuelos'
+        'titulo': 'Gestión de Vuelos',
+        'filtros': {
+            'origen': origen or '',
+            'destino': destino or '',
+            'estado': estado or '',
+        },
+        'origenes': origenes,
+        'destinos': destinos,
     }
     return render(request, 'paneladmin/manage_flights.html', context)
+
 
 def create_flight_view(request):
     if request.method == 'POST':
@@ -250,12 +279,24 @@ def delete_reservation_view(request, reservation_id):
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 #<---------------------- Asientos ----------------------------->
+
 def manage_seats_view(request):
     if request.session.get('usuario_rol') != 'Admin':
         return redirect('dashboard')
-    
-    asientos = Asiento.objects.select_related('codigo', 'usuario_reservado')\
-    .all().order_by('-reservado', 'codigo__codigo', 'asiento_numero')
+
+    vuelo_codigo = request.GET.get('vuelo')
+    usuario_id = request.GET.get('usuario')
+
+    asientos = Asiento.objects.select_related('codigo', 'usuario_reservado').all()
+
+    if vuelo_codigo:
+        asientos = asientos.filter(codigo__codigo__icontains=vuelo_codigo)
+
+    if usuario_id:
+        asientos = asientos.filter(usuario_reservado__id_usuario=usuario_id)
+
+    asientos = asientos.order_by('-reservado', 'codigo__codigo', 'asiento_numero')
+
     vuelos = Vuelos.objects.all()
     usuarios = Usuario.objects.all()
 
@@ -263,9 +304,12 @@ def manage_seats_view(request):
         'asientos': asientos,
         'vuelos': vuelos,
         'usuarios': usuarios,
-        'titulo': 'Gestión de Asientos'
+        'titulo': 'Gestión de Asientos',
+        'vuelo_codigo': vuelo_codigo or '',
+        'usuario_id': usuario_id or ''
     }
     return render(request, 'paneladmin/manage_seats.html', context)
+
 
 def create_seat_view(request):
     if request.method == 'POST':

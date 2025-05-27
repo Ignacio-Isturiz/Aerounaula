@@ -14,6 +14,28 @@
         <i class="bx bx-plus me-2"></i>Nuevo Asiento
       </button>
     </div>
+    <form method="get" class="row g-3 px-4 py-3">
+  <div class="col-md-4">
+    <label class="form-label">Código de Vuelo</label>
+    <input type="text" name="vuelo" class="form-control" value="{{ vuelo_codigo }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Usuario</label>
+    <select name="usuario" class="form-select">
+      <option value="">--- Todos ---</option>
+      {% for usuario in usuarios %}
+        <option value="{{ usuario.id_usuario }}" {% if usuario_id == usuario.id_usuario|stringformat:"s" %}selected{% endif %}>
+          {{ usuario.nombre }} ({{ usuario.correo }})
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4 d-flex align-items-end">
+    <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+    <a href="{% url 'manage_seats' %}" class="btn btn-secondary">Limpiar</a>
+  </div>
+</form>
+
 
     <div class="table-responsive text-nowrap">
       <table class="table table-hover" id="seatTable">
