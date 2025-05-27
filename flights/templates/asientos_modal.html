@@ -1,0 +1,47 @@
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Asiento</th>
+            <th>Tipo de pasajero</th>
+            <th>Vuelo</th>
+            <th>Fecha de salida</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if asientos %}
+            {% for asiento in asientos %}
+                <tr>
+                    <td>{{ asiento.asiento_numero }}</td>
+                    <td>
+                        {% if asiento.tipo_pasajero %}
+                            {{ asiento.tipo_pasajero|capfirst }}
+                        {% else %}
+                            No especificado
+                        {% endif %}
+                    </td>
+                    <td>{{ vuelo.origen }} → {{ vuelo.destino }}</td>
+                    <td>{{ vuelo.fecha_salida|date:"d/m/Y H:i" }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4" class="text-center">
+                    Aún no has elegido asientos. <br>
+                    Puedes reservarlos aquí:
+                    <br>
+                    <a href="{% url 'asignar_asientos' reserva.vuelo.codigo %}" class="btn btn-sm btn-outline-primary mt-2">
+                        Asignar asientos
+                    </a>
+                </td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+{% if asientos %}
+    <div class="mt-3">
+        <a href="{% url 'asignar_asientos' reserva.vuelo.codigo %}" class="btn btn-sm btn-outline-primary">
+            Asignar más asientos
+        </a>
+    </div>
+{% endif %}

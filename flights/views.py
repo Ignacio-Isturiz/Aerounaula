@@ -5,6 +5,8 @@ from dbmodels.models.reserva import Reserva
 from dbmodels.models.asiento import Asiento
 from dbmodels.models.usuario import Usuario
 from django.utils import timezone
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
 from django.contrib import messages
@@ -154,8 +156,11 @@ def reservar_vuelo(request, codigo):
     vuelo = get_object_or_404(Vuelos, codigo=codigo)
 
     ya_reservado = Reserva.objects.filter(id_usuario=usuario_id, vuelo=vuelo).exists()
-    if not ya_reservado:
+    if ya_reservado:
+        messages.warning(request, 'Ya tienes una reserva para este vuelo.')
+    else:
         Reserva.objects.create(id_usuario_id=usuario_id, vuelo=vuelo, fecha_reserva=timezone.now())
+        messages.success(request, '¡Vuelo reservado con éxito!')
 
     return redirect('vuelos')
 
@@ -172,6 +177,27 @@ def mis_reservas(request):
         'usuario_rol': request.session.get('usuario_rol'),
         'ocultar_navbar': False
     })
+def asientos_ajax(request, vuelo_codigo, reserva_id):
+    vuelo = get_object_or_404(Vuelos, codigo=vuelo_codigo)
+    reserva = get_object_or_404(Reserva, id_reserva=reserva_id, vuelo=vuelo)
+
+    usuario = reserva.id_usuario
+
+    asientos_reservados = Asiento.objects.filter(
+        codigo=vuelo,
+        usuario_reservado=usuario,
+        reservado=True
+    ).order_by('asiento_numero')
+
+    # Siempre renderizamos la plantilla para manejar la lógica en el template
+    html = render_to_string('asientos_modal.html', {
+        'asientos': asientos_reservados,
+        'reserva': reserva,
+        'vuelo': vuelo,
+    })
+
+    return HttpResponse(html)
+
 
 @require_POST
 def cancelar_reserva(request, id_reserva):
@@ -276,25 +302,6 @@ def asignar_asientos(request, codigo):
         'asientos_usuario': asientos.filter(usuario_reservado=usuario), # Asientos ya reservados por el usuario
         # 'disponibles': asientos.filter(reservado=False), # Ya no necesitas 'disponibles' por separado si manejas el estado en el template
     })
-
-
-def mis_asientos(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
-
-    usuario_id = request.session['usuario_id']
-    usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
-
-    # Filtrar los asientos asignados al usuario y prefetch el vuelo para evitar N+1 queries
-    asientos = Asiento.objects.select_related('codigo').filter(usuario_reservado=usuario).order_by('codigo__codigo', 'asiento_numero')
-
-    return render(request, 'mis_asientos.html', {
-        'asientos': asientos,
-        'usuario_nombre': request.session.get('usuario_nombre'),
-        'usuario_rol': request.session.get('usuario_rol'),
-        'ocultar_navbar': False
-    })
-
 
 @require_POST
 def cancelar_asiento(request, asiento_id):

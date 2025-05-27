@@ -3,12 +3,6 @@
 <div class="container mt-4">
     <h2>Tus Reservas</h2>
 
-    <div class="d-flex justify-content-between mb-4">
-        <a href="{% url 'mis_asientos' %}" class="btn btn-primary btn-lg">
-            Ver mis asientos
-        </a>
-    </div>
-
     {% if messages %}
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -28,9 +22,19 @@
                         Reservado el: {{ reserva.fecha_reserva|date:"d/m/Y H:i" }}
                     </div>
                     <div class="d-flex gap-2">
-                        <a href="{% url 'asignar_asientos' reserva.vuelo.codigo %}" class="btn btn-sm btn-outline-primary">
+                        <!-- <a href="{% url 'asignar_asientos' reserva.vuelo.codigo %}" class="btn btn-sm btn-outline-primary">
                             Asignar asientos
-                        </a>
+                        </a> -->
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#asientosModal"
+                            data-vuelo="{{ reserva.vuelo.codigo }}"
+                            data-reserva="{{ reserva.id_reserva }}">
+                            Ver asientos
+                        </button>
+
                     
                         <form method="post" action="{% url 'cancelar_reserva' reserva.id_reserva %}" onsubmit="return confirm('¿Estás seguro de cancelar esta reserva?');">
                             {% csrf_token %}
@@ -40,8 +44,47 @@
                 </li>
             {% endfor %}
         </ul>
+        <!-- Modal -->
+<div class="modal fade" id="asientosModal" tabindex="-1" aria-labelledby="asientosModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="asientosModalLabel">Asientos del vuelo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" id="asientosModalBody">
+        <p class="text-center text-muted">Cargando asientos...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
     {% else %}
         <p>No tienes reservas aún.</p>
     {% endif %}
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('asientosModal');
+
+    modal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const vueloCodigo = button.getAttribute('data-vuelo');
+        const reservaId = button.getAttribute('data-reserva');
+        const modalBody = modal.querySelector('#asientosModalBody');
+
+        // Carga los asientos por AJAX (puede usar Fetch o jQuery)
+        fetch(`/asientos_ajax/${vueloCodigo}/${reservaId}/`)
+            .then(response => response.text())
+            .then(html => {
+                modalBody.innerHTML = html;
+            })
+            .catch(error => {
+                modalBody.innerHTML = '<div class="alert alert-danger">Error al cargar los asientos.</div>';
+                console.error(error);
+            });
+    });
+});
+</script>
+
 {% endblock %}

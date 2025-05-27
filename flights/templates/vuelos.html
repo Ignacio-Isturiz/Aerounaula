@@ -11,7 +11,7 @@
         <p class="text-white-50 lead">Vuela por Colombia y el mundo con Aerounaula</p>
         <div class="search-form-container p-4 p-md-5 mx-auto">
             <form method="get" id="flightSearchForm" class="row g-3 align-items-end">
-                <div class="col-md-4"> {# Adjusted col-md-3 to col-md-4 #}
+                <div class="col-md-4">
                     <label for="origen" class="form-label text-dark-emphasis mb-1"><i class="bi bi-airplane-fill"></i> Origen</label>
                     <select class="form-select search-input" name="origen" id="origen">
                         <option value="">Ciudad de origen</option>
@@ -20,7 +20,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-4"> {# Adjusted col-md-3 to col-md-4 #}
+                <div class="col-md-4">
                     <label for="destino" class="form-label text-dark-emphasis mb-1"><i class="bi bi-geo-alt-fill"></i> Destino</label>
                     <select class="form-select search-input" name="destino" id="destino">
                         <option value="">Ciudad de destino</option>
@@ -33,12 +33,12 @@
                     <label for="fecha_ida" class="form-label text-dark-emphasis mb-1"><i class="bi bi-calendar-check-fill"></i> Fecha de ida</label>
                     <input type="date" id="fecha_ida" name="fecha_ida" class="form-control">
                 </div>
-                 {% if usuario_rol %} {# Only show for admin/staff to filter by code #}
-                 <div class="col-12 mt-3">
+                {% if usuario_rol %}
+                <div class="col-12 mt-3">
                     <label for="codigo_vuelo_admin" class="form-label text-dark-emphasis mb-1"><i class="bi bi-barcode"></i> Código de Vuelo</label>
                     <input type="text" id="codigo_vuelo_admin" name="codigo" value="{{ request.GET.codigo }}" class="form-control search-input" placeholder="Ej: AU1001">
-                 </div>
-                 {% endif %}
+                </div>
+                {% endif %}
                 <div class="col-12 mt-4">
                     <button type="submit" class="btn btn-primary search-button w-100">
                         <i class="bi bi-airplane-engines-fill me-2"></i> Buscar vuelos
@@ -61,108 +61,125 @@
     </div>
 
     {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    <!-- Modal de mensajes -->
+    <div class="modal fade" id="mensajeReservaModal" tabindex="-1" aria-labelledby="mensajeReservaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="mensajeReservaLabel"><i class="bi bi-info-circle-fill me-2"></i>Mensaje</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    {% for message in messages %}
+                        <p class="mb-0 {% if message.tags == 'success' %}text-success{% elif message.tags == 'warning' %}text-warning{% endif %}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
         </div>
-      {% endfor %}
+    </div>
     {% endif %}
 
     <div id="flightList" class="flight-list">
         {% for vuelo in vuelos %}
         <div class="card mb-4 p-3 shadow-sm border-0 rounded-3">
-          <div class="row g-3 align-items-center">
-            <!-- Logo / imagen destino -->
-            <div class="col-md-2 d-flex justify-content-center align-items-center">
-              <img src="{{ vuelo.imagen_url }}" alt="Destino" class="rounded" style="width: 100%; height: 110px; object-fit: cover;">
-            </div>
-        
-            <!-- Información del vuelo -->
-            <div class="col-md-7">
-              <div class="text-muted small mb-2">
-                Codigo: {{ vuelo.codigo }}
+            <div class="row g-3 align-items-center">
+                <div class="col-md-2 d-flex justify-content-center align-items-center">
+                    <img src="{{ vuelo.imagen_url }}" alt="Destino" class="rounded" style="width: 100%; height: 110px; object-fit: cover;">
                 </div>
-                <div class="d-flex align-items-center mb-2">
-                <span class="fw-bold">{{ vuelo.origen }}</span>
-                <span class="mx-2"><i class="bi bi-arrow-right"></i></span>
-                <span class="fw-bold">{{ vuelo.destino }}</span>
-                </div>
-                <div class="d-flex align-items-center gap-4 text-secondary mb-2">
-                  <div class="d-flex align-items-center gap-1">
-                    <i class="bi bi-wifi fs-5 text-primary" title="Wi-Fi disponible"></i>
-                    <span class="small">Wi-Fi</span>
-                  </div>
-                  <div class="d-flex align-items-center gap-1">
-                    <i class="bi bi-cup-straw fs-5 text-warning" title="Bebidas incluidas"></i>
-                    <span class="small">Bebidas</span>
-                  </div>
-                  <div class="d-flex align-items-center gap-1">
-                    <i class="bi bi-briefcase-fill fs-5 text-success" title="Equipaje de mano"></i>
-                    <span class="small">Equipaje</span>
+                <div class="col-md-7">
+                    <div class="text-muted small mb-2">Código: {{ vuelo.codigo }}</div>
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="fw-bold">{{ vuelo.origen }}</span>
+                        <span class="mx-2"><i class="bi bi-arrow-right"></i></span>
+                        <span class="fw-bold">{{ vuelo.destino }}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-4 text-secondary mb-2">
+                        <div class="d-flex align-items-center gap-1">
+                            <i class="bi bi-wifi fs-5 text-primary" title="Wi-Fi disponible"></i>
+                            <span class="small">Wi-Fi</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <i class="bi bi-cup-straw fs-5 text-warning" title="Bebidas incluidas"></i>
+                            <span class="small">Bebidas</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <i class="bi bi-briefcase-fill fs-5 text-success" title="Equipaje de mano"></i>
+                            <span class="small">Equipaje</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-muted small">
+                            <i class="bi bi-calendar-event me-1"></i>{{ vuelo.fecha_salida|date:"d/m/Y" }}
+                        </div>
                     </div>
                 </div>
-              <div class="d-flex align-items-center gap-3">
-                <div class="text-muted small">
-                  <i class="bi bi-calendar-event me-1"></i>{{ vuelo.fecha_salida|date:"d/m/Y" }}
+                <div class="col-md-3 text-end">
+                    <small class="text-muted">Precio por persona</small>
+                    <div class="fs-5 fw-bold text-primary mb-2">${{ vuelo.precio|floatformat:0|intcomma }}</div>
+                    {% if usuario_rol == "User" %}
+                    <form method="post" action="{% url 'reservar_vuelo' vuelo.codigo %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100">Reservar</button>
+                    </form>
+                    {% else %}
+                    <div class="text-muted small fst-italic">Inicia sesión para reservar</div>
+                    {% endif %}
                 </div>
-              </div>
             </div>
-        
-            <!-- Precio y acción -->
-            <div class="col-md-3 text-end">
-              <small class="text-muted">Precio por persona</small>
-              <div class="fs-5 fw-bold text-primary mb-2">${{ vuelo.precio|floatformat:0|intcomma }}</div>
-              {% if usuario_rol == "User" %}
-            <form method="post" action="{% url 'reservar_vuelo' vuelo.codigo %}">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-primary w-40">Reservar</button>
-            </form>
-          {% else %}
-            <div class="text-muted small fst-italic">Inicia sesión para reservar</div>
-          {% endif %}
-            </div>
-          </div>
         </div>
         {% empty %}
         <div class="alert alert-info text-center" role="alert">
-          <i class="bi bi-info-circle me-2"></i> No hay vuelos disponibles que coincidan con tus criterios.
+            <i class="bi bi-info-circle me-2"></i> No hay vuelos disponibles que coincidan con tus criterios.
         </div>
         {% endfor %}
 
-    {% if vuelos.has_other_pages %}
-    <div class="d-flex justify-content-center mt-4">
-        <nav aria-label="Page navigation">
-            <ul class="pagination custom-pagination">
-                {% if vuelos.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ vuelos.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> <</a>
-                    </li>
-                {% endif %}
-
-                {% for i in vuelos.paginator.page_range %}
-                    {% if vuelos.number == i %}
-                        <li class="page-item active" aria-current="page"><span class="page-link">{{ i }}</span></li>
-                    {% else %}
+        {% if vuelos.has_other_pages %}
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination custom-pagination">
+                    {% if vuelos.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a>
+                            <a class="page-link" href="?page={{ vuelos.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> < </a>
                         </li>
                     {% endif %}
-                {% endfor %}
-
-                {% if vuelos.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ vuelos.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> > </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
+                    {% for i in vuelos.paginator.page_range %}
+                        {% if vuelos.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if vuelos.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ vuelos.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> > </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'js/filtroVuelos.js' %}"></script>
 <script src="{% static 'js/vuelos.js' %}"></script>
+
+{% if messages %}
+<script>
+     document.addEventListener('DOMContentLoaded', function () {
+        const modalElement = document.getElementById('mensajeReservaModal');
+        const modal = new bootstrap.Modal(modalElement, {
+            scroll: false,
+            focus: false
+        });
+        modal.show();
+    });
+</script>
+{% endif %}
 {% endblock %}
