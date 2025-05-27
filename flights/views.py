@@ -143,6 +143,7 @@ def cancelar_reserva(request, id_reserva):
     messages.success(request, "La reserva fue cancelada correctamente.")
     return redirect('mis_reservas')
 
+
 def asignar_asientos(request, codigo):
     if not request.session.get('usuario_id'):
         return redirect('login')
@@ -152,13 +153,21 @@ def asignar_asientos(request, codigo):
 
     # Verificar si el usuario tiene una reserva en el vuelo
     if not Reserva.objects.filter(id_usuario=usuario_id, vuelo=vuelo).exists():
+        messages.error(request, "No tienes una reserva activa para este vuelo.")
         return redirect('mis_reservas')
 
     # Obtener datos del usuario y asientos
     usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
+    # Filtrar asientos por el código del vuelo asociado al asiento
     asientos = Asiento.objects.filter(codigo=vuelo).order_by('asiento_numero')
-    asientos_usuario = asientos.filter(usuario_reservado=usuario)  # Asientos ya reservados por el usuario
-    disponibles = asientos.filter(reservado=False)  # Asientos disponibles
+
+    asientos_en_filas = []
+    # Iteramos de 4 en 4 para formar las filas del avión
+    for i in range(0, len(asientos), 4):
+        # Cada 'fila_asientos' contendrá hasta 4 asientos (ej: [A1, A2, A3, A4])
+        fila_asientos = asientos[i:i+4]
+        # Almacenamos esta lista de 4 asientos en nuestra lista principal
+        asientos_en_filas.append(fila_asientos)
 
     if request.method == 'POST':
         asientos_seleccionados_str = request.POST.get('asientos_seleccionados', '')
@@ -182,9 +191,9 @@ def asignar_asientos(request, codigo):
                 return redirect('asignar_asientos', codigo=vuelo.codigo)
 
         # Filtrar los asientos seleccionados y verificar disponibilidad
-        nuevos = Asiento.objects.filter(id__in=seleccionados.keys(), reservado=False)
+        nuevos = Asiento.objects.filter(id__in=seleccionados.keys(), reservado=False, codigo=vuelo) # Asegura que los asientos sean de este vuelo
         if nuevos.count() != len(seleccionados):
-            messages.error(request, "Uno o más asientos seleccionados no están disponibles.")
+            messages.error(request, "Uno o más asientos seleccionados no están disponibles o pertenecen a otro vuelo.")
             return redirect('asignar_asientos', codigo=vuelo.codigo)
 
         # Crear resumen de precios
@@ -206,9 +215,10 @@ def asignar_asientos(request, codigo):
             precio_final = precio - (precio * descuento)
 
             resumen_asientos.append({
+                'asiento_id': asiento.id, # Agrega el ID para fácil acceso si necesitas
                 'asiento': asiento.asiento_numero,
                 'tipo_pasajero': tipo_pasajero,
-                'precio': float(precio_final)
+                'precio': float(precio_final) # Convertir a float si lo usarás en un template o JSON
             })
 
         # Guardar en sesión
@@ -221,9 +231,9 @@ def asignar_asientos(request, codigo):
     # GET: Mostrar la plantilla
     return render(request, 'asignar_asientos.html', {
         'vuelo': vuelo,
-        'asientos': asientos,
-        'disponibles': disponibles,
-        'asientos_usuario': asientos_usuario,
+        'asientos_en_filas': asientos_en_filas, # <-- ¡Este es el cambio clave para el front!
+        'asientos_usuario': asientos.filter(usuario_reservado=usuario), # Asientos ya reservados por el usuario
+        # 'disponibles': asientos.filter(reservado=False), # Ya no necesitas 'disponibles' por separado si manejas el estado en el template
     })
 
 
@@ -234,11 +244,11 @@ def mis_asientos(request):
     usuario_id = request.session['usuario_id']
     usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
 
-    # Filtrar los asientos asignados al usuario
-    asientos = Asiento.objects.select_related('codigo').filter(usuario_reservado=usuario)
+    # Filtrar los asientos asignados al usuario y prefetch el vuelo para evitar N+1 queries
+    asientos = Asiento.objects.select_related('codigo').filter(usuario_reservado=usuario).order_by('codigo__codigo', 'asiento_numero')
 
     return render(request, 'mis_asientos.html', {
-        'asientos': asientos,  # 👈 esto era lo que faltaba
+        'asientos': asientos,
         'usuario_nombre': request.session.get('usuario_nombre'),
         'usuario_rol': request.session.get('usuario_rol'),
         'ocultar_navbar': False
@@ -258,13 +268,23 @@ def cancelar_asiento(request, asiento_id):
     asiento.save()
 
     # Enviar correo si quieres notificar
-    send_mail(
-        subject="Cancelación de asiento",
-        message=f"Has cancelado tu asiento {asiento.asiento_numero} en el vuelo {asiento.codigo.origen} → {asiento.codigo.destino}.",
-        from_email=None,
-        recipient_list=[request.session.get('usuario_correo')],
-        fail_silently=True
-    )
+    # Asegúrate de configurar las credenciales de email en settings.py
+    try:
+        send_mail(
+            subject="Cancelación de asiento confirmada",
+            message=f"Hola {request.session.get('usuario_nombre')},\n\n"
+                    f"Has cancelado tu asiento {asiento.asiento_numero} "
+                    f"en el vuelo {asiento.codigo.origen} → {asiento.codigo.destino} (Código: {asiento.codigo.codigo}).\n\n"
+                    "¡Esperamos verte pronto!",
+            from_email=None, # Usará DEFAULT_FROM_EMAIL de settings.py si no se especifica
+            recipient_list=[request.session.get('usuario_correo')],
+            fail_silently=False # Cambia a True en producción si no quieres que falle la vista por error de email
+        )
+    except Exception as e:
+        # Esto es útil para depurar si el correo no se envía
+        print(f"Error al enviar correo de cancelación: {e}")
+        messages.warning(request, "El asiento fue cancelado, pero no se pudo enviar el correo de confirmación.")
+
 
     messages.success(request, "El asiento fue cancelado correctamente.")
     return HttpResponseRedirect(reverse('mis_asientos'))
@@ -276,48 +296,95 @@ def confirmar_asientos(request):
     usuario_id = request.session['usuario_id']
     usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
     vuelo_codigo = request.session.get('vuelo_codigo')
+
+    # Redirigir si no hay un vuelo_codigo en sesión (ej. acceso directo)
+    if not vuelo_codigo:
+        messages.error(request, "No hay una selección de asientos pendiente para confirmar.")
+        return redirect('mis_reservas') # O a la página de selección de vuelos
+
     vuelo = get_object_or_404(Vuelos, codigo=vuelo_codigo)
 
     # Obtener el resumen de los asientos desde la sesión
     resumen_asientos = request.session.get('resumen_asientos')
     seleccionados_ids = request.session.get('seleccionados_ids')
 
+    # Si no hay datos en sesión, significa que la sesión expiró o se accedió directamente
+    if not resumen_asientos or not seleccionados_ids:
+        messages.error(request, "Tu sesión de selección de asientos ha expirado o es inválida. Por favor, selecciona tus asientos nuevamente.")
+        return redirect('asignar_asientos', codigo=vuelo_codigo) # Redirige para seleccionar de nuevo
+
     # Si el usuario aún no ha confirmado, mostrar el resumen para revisión
     if request.method == 'GET':
+        # Calcular el precio total aquí para mostrarlo en el template de confirmación
+        precio_total = sum(item['precio'] for item in resumen_asientos)
+
         return render(request, 'confirmar_asientos.html', {
             'vuelo': vuelo,
             'resumen_asientos': resumen_asientos,
+            'precio_total': precio_total, # Agregado para mostrar el total
             'usuario_nombre': request.session.get('usuario_nombre'),
             'usuario_rol': request.session.get('usuario_rol'),
         })
 
     # POST: Confirmar los asientos seleccionados
-    asientos_seleccionados = Asiento.objects.filter(id__in=seleccionados_ids)
-    for asiento in asientos_seleccionados:
+    # Es crucial re-verificar la disponibilidad aquí para evitar ataques de carrera
+    asientos_a_reservar = Asiento.objects.filter(id__in=seleccionados_ids, reservado=False, codigo=vuelo)
+
+    # Si la cantidad de asientos a reservar no coincide con los que se intentaron seleccionar
+    # significa que algunos ya fueron reservados por otra persona.
+    if asientos_a_reservar.count() != len(seleccionados_ids):
+        messages.error(request, "Algunos de los asientos que seleccionaste ya no están disponibles. Por favor, revisa tu selección.")
+        # Limpia sesión para forzar una nueva selección
+        del request.session['resumen_asientos']
+        del request.session['seleccionados_ids']
+        del request.session['vuelo_codigo']
+        return redirect('asignar_asientos', codigo=vuelo_codigo)
+
+
+    for asiento in asientos_a_reservar:
         asiento.reservado = True
         asiento.usuario_reservado = usuario
         asiento.save()
 
+    # Actualizar o crear la Reserva.
+    # Si una reserva ya existe para el usuario y el vuelo, se actualiza; si no, se crea.
     reserva, created = Reserva.objects.get_or_create(
-    id_usuario=usuario,
-    vuelo=vuelo,
-    defaults={'fecha_reserva': timezone.now()}
-)
+        id_usuario=usuario,
+        vuelo=vuelo,
+        defaults={'fecha_reserva': timezone.now()} # Solo se usa si se crea la reserva
+    )
+    # Si la reserva ya existía, puedes actualizar su fecha_reserva si lo deseas:
+    # if not created:
+    #     reserva.fecha_reserva = timezone.now()
+    #     reserva.save()
 
 
     # Enviar el correo de confirmación
-    send_mail(
-        subject="Confirmación de reserva de asientos",
-        message=f"Has reservado los siguientes asientos en el vuelo {vuelo.origen} → {vuelo.destino}.\nAsientos: {', '.join([str(item['asiento']) for item in resumen_asientos])}",
-        from_email=None,
-        recipient_list=[usuario.correo],
-        fail_silently=False
-    )
+    asientos_numeros = [str(item['asiento']) for item in resumen_asientos]
+    try:
+        send_mail(
+            subject="Confirmación de reserva de asientos",
+            message=f"Hola {usuario.nombre},\n\n"
+                    f"Has reservado los siguientes asientos en el vuelo {vuelo.origen} ({vuelo.codigo}) → {vuelo.destino}:\n"
+                    f"Asientos: {', '.join(asientos_numeros)}\n\n"
+                    f"El total a pagar es: ${sum(item['precio'] for item in resumen_asientos):.2f}\n\n"
+                    "¡Gracias por tu reserva!",
+            from_email=None,
+            recipient_list=[usuario.correo],
+            fail_silently=False
+        )
+    except Exception as e:
+        print(f"Error al enviar correo de confirmación: {e}")
+        messages.warning(request, "Tus asientos han sido reservados, pero no se pudo enviar el correo de confirmación.")
 
-    # Limpiar la sesión
-    del request.session['resumen_asientos']
-    del request.session['seleccionados_ids']
-    del request.session['vuelo_codigo']
+
+    # Limpiar la sesión después de la confirmación exitosa
+    if 'resumen_asientos' in request.session:
+        del request.session['resumen_asientos']
+    if 'seleccionados_ids' in request.session:
+        del request.session['seleccionados_ids']
+    if 'vuelo_codigo' in request.session:
+        del request.session['vuelo_codigo']
 
     messages.success(request, "Tus asientos han sido reservados correctamente.")
     return redirect('mis_asientos')

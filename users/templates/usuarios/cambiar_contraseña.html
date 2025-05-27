@@ -1,22 +1,43 @@
 {% extends "usuarios/base.html" %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Cambiar contraseña</h2>
-    <form method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <label>Contraseña actual</label>
-            <input type="password" name="clave_actual" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label>Nueva contraseña</label>
-            <input type="password" name="nueva_clave" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label>Confirmar nueva contraseña</label>
-            <input type="password" name="confirmar_clave" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Guardar cambios</button>
-    </form>
+<div class="container mt-5 mb-5">
+
+  <div class="col-lg-6 mx-auto">
+
+    <div class="card shadow rounded">
+      <div class="card-header bg-primary text-white text-center">
+        <h5 class="mb-0">🔒 Cambiar contraseña</h5>
+      </div>
+
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="form-floating mb-3">
+            <input type="password" name="clave_actual" id="clave_actual" class="form-control" placeholder="Contraseña actual" required>
+            <label for="clave_actual">Contraseña actual</label>
+          </div>
+
+          <div class="form-floating mb-3">
+            <input type="password" name="nueva_clave" id="nueva_clave" class="form-control" placeholder="Nueva contraseña" required>
+            <label for="nueva_clave">Nueva contraseña</label>
+          </div>
+
+          <div class="form-floating mb-4">
+            <input type="password" name="confirmar_clave" id="confirmar_clave" class="form-control" placeholder="Confirmar nueva contraseña" required>
+            <label for="confirmar_clave">Confirmar nueva contraseña</label>
+          </div>
+
+          <div class="text-center">
+            <button type="submit" class="btn btn-success px-4">
+              Guardar cambios
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
 </div>
 {% endblock %}
