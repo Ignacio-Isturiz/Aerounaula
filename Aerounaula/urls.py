@@ -23,6 +23,7 @@ urlpatterns = [
     path('', include('flights.urls')), 
     path('paneladmin/', include('paneladmin.urls')), 
     path("asistente/", include("asistente.urls")),
+    
 ]
 
 

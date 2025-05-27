@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador de Vuelo</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>#map { height: 100vh; }</style>
+</head>
+<body>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    const origen = {
+        ciudad: "{{ vuelo.origen }}",
+        lat: parseFloat("{{ origen_lat }}"),
+        lng: parseFloat("{{ origen_lng }}")
+    };
+
+    const destino = {
+        ciudad: "{{ vuelo.destino }}",
+        lat: parseFloat("{{ destino_lat }}"),
+        lng: parseFloat("{{ destino_lng }}")
+    };
+    
+    const fecha = "{{ vuelo.fecha_salida|date:'d/m/Y H:i' }}";
+    const precio = "{{ vuelo.precio }}";
+
+    const map = L.map('map').setView([(origen.lat + destino.lat)/2, (origen.lng + destino.lng)/2], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    L.marker([origen.lat, origen.lng]).addTo(map)
+        .bindPopup(`<b>Origen:</b> ${origen.ciudad}`).openPopup();
+
+    L.marker([destino.lat, destino.lng]).addTo(map)
+        .bindPopup(`<b>Destino:</b> ${destino.ciudad}<br><b>Precio:</b> $${precio}<br><b>Fecha:</b> ${fecha}`);
+
+    L.polyline([[origen.lat, origen.lng], [destino.lat, destino.lng]], { color: 'blue' }).addTo(map);
+</script>
+</body>
+</html>

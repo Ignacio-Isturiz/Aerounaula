@@ -19,11 +19,11 @@
           <div class="bubble user">{{ mensaje.user }}</div>
 
           {% if forloop.last %}
-            <div class="bubble bot fade-hidden" id="bot-latest-response">{{ mensaje.bot }}</div>
-            <div class="bubble bot" id="typing-indicator">✈️ Escribiendo...</div>
-          {% else %}
-            <div class="bubble bot">{{ mensaje.bot }}</div>
-          {% endif %}
+          <div class="bubble bot fade-hidden" id="bot-latest-response">{{ mensaje.bot|safe }}</div>
+          <div class="bubble bot" id="typing-indicator">✈️ Escribiendo...</div>
+        {% else %}
+          <div class="bubble bot">{{ mensaje.bot|safe }}</div>
+        {% endif %}
         {% endfor %}
       {% else %}
         <div class="bubble bot">
