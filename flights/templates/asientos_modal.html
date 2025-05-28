@@ -2,7 +2,6 @@
     <thead>
         <tr>
             <th>Asiento</th>
-            <th>Tipo de pasajero</th>
             <th>Vuelo</th>
             <th>Fecha de salida</th>
         </tr>
@@ -12,15 +11,8 @@
             {% for asiento in asientos %}
                 <tr>
                     <td>{{ asiento.asiento_numero }}</td>
-                    <td>
-                        {% if asiento.tipo_pasajero %}
-                            {{ asiento.tipo_pasajero|capfirst }}
-                        {% else %}
-                            No especificado
-                        {% endif %}
-                    </td>
                     <td>{{ vuelo.origen }} → {{ vuelo.destino }}</td>
-                    <td>{{ vuelo.fecha_salida|date:"d/m/Y H:i" }}</td>
+                    <td>{{ vuelo.fecha_salida|date:"d/m/Y" }}</td>
                 </tr>
             {% endfor %}
         {% else %}
@@ -45,6 +37,9 @@
         </a>
         <a href="#" class="btn btn-sm btn-outline-primary">
             Hacer Check_In
+        </a>
+        <a href="{% url 'mis_asientos' %}" class="btn btn-sm btn-outline-primary">
+            Cancelar asientos
         </a>
     </div>
 {% endif %}
