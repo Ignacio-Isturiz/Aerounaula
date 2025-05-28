@@ -437,6 +437,23 @@ def confirmar_asientos(request):
     messages.success(request, "Tus asientos han sido reservados correctamente.")
     return redirect('mis_asientos')
 
+def mis_asientos(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+
+    usuario_id = request.session['usuario_id']
+    usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
+
+    # Filtrar los asientos asignados al usuario y prefetch el vuelo para evitar N+1 queries
+    asientos = Asiento.objects.select_related('codigo').filter(usuario_reservado=usuario).order_by('codigo__codigo', 'asiento_numero')
+
+    return render(request, 'mis_asientos.html', {
+        'asientos': asientos,
+        'usuario_nombre': request.session.get('usuario_nombre'),
+        'usuario_rol': request.session.get('usuario_rol'),
+        'ocultar_navbar': False
+    })
+
 def info_equipaje(request):
     return render(request, 'informacion/equipaje.html')
 
