@@ -74,8 +74,9 @@
                         <p class="mb-0 {% if message.tags == 'success' %}text-success{% elif message.tags == 'warning' %}text-warning{% endif %}">{{ message }}</p>
                     {% endfor %}
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal">Aceptar</button>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Seguir navegando</button>
+                    <a href="{% url 'mis_reservas' %}" class="btn btn-primary">Ir a mis reservas</a>
                 </div>
             </div>
         </div>
