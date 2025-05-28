@@ -459,3 +459,6 @@ def info_equipaje(request):
 
 def sobre_nosotros(request):
     return render(request, 'usuarios/sobre_nosotros.html')
+
+def info_mascotas(request):
+    return render(request, 'usuarios/mascotas.html')

@@ -40,7 +40,10 @@
                         <a class="nav-link" href="{% url 'info_equipaje' %}">Equipaje</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'sobre_nosotros' %}">¿Quiénes somos?</a>
+                        <a class="nav-link" href="{% url 'info_mascotas' %}">Mascotas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'sobre_nosotros' %}">Sobre nosotros</a>
                     </li>
                 </ul>
                 {% if request.session.usuario_id %}
@@ -86,10 +89,10 @@
             <div>
                 <h6 class="fw-bold">Síguenos</h6>
                 <div class="d-flex gap-2 justify-content-center justify-content-md-start">
-                    <a href="#" class="footer-icon"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="footer-icon"><i class="bi bi-twitter"></i></a>
-                    <a href="#" class="footer-icon"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="footer-icon"><i class="bi bi-linkedin"></i></a>
+                    <a href="https://github.com/Ignacio-Isturiz/Aerounaula" class="footer-icon"><i class="bi bi-github"></i></a>
+                    <a href="https://www.linkedin.com/in/jose-ignacio-ist%C3%BAriz-rabert-b82115244/" class="footer-icon"><i class="bi bi-linkedin"></i></a>
+                    <a href="https://www.instagram.com/_jiir23/" class="footer-icon"><i class="bi bi-instagram"></i></a>
+                    <a href="https://wa.me/573124783081?text=¡Hola, Aerounaula!" class="footer-icon"><i class="bi bi-whatsapp"></i></a>
                 </div>
             </div>
         </div>

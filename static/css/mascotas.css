@@ -1,0 +1,55 @@
+.hero-mascotas {
+    height: 60vh;
+    background-image: url("../images/mascotas/heroMascotas.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-blend-mode: overlay;
+    box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.3);
+}
+
+.hero-mascotas .container h1 {
+    font-size: 3.2rem;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.hero-mascotas .container p {
+    font-size: 1.3rem;
+    font-weight: 300;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+ul li {
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.bg-light, .bg-white {
+    transition: all 0.3s ease-in-out;
+}
+
+.bg-light:hover, .bg-white:hover {
+    transform: scale(1.01);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    border: none;
+    transition: transform 0.2s ease-in-out;
+    border-radius: 12px;
+}
+
+.card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+}
+
+.card h5 {
+    font-size: 1.2rem;
+}
+
+.bg-light-subtle {
+    background-color: #f5f7fa;
+}
+

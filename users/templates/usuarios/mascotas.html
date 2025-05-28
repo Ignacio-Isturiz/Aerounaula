@@ -1,0 +1,179 @@
+{% extends "usuarios/base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/mascotas.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block title %}Viaja con tu mascota{% endblock %}
+
+{% block content %}
+<section class="hero-mascotas d-flex align-items-center text-white mb-5">
+  <div class="container text-center py-5">
+    <h1 class="display-4 fw-bold">¿Qué tipo de animales pueden volar?</h1>
+    <p class="lead">Conoce las condiciones para viajar con tu perro o gato.</p>
+  </div>
+</section>
+
+<div class="container mb-5">
+  <!-- Secciones principales -->
+  <div class="row align-items-center mb-5">
+    <div class="col-md-5 text-center">
+      <img src="{% static 'images/mascotas/cabina.svg' %}" alt="Mascota en cabina" class="img-fluid">
+    </div>
+    <div class="col-md-7 bg-light rounded p-4 shadow-sm">
+      <h3 class="fw-bold mb-3">Mascotas en cabina</h3>
+      <ul>
+        <li><strong>Peso:</strong> Máximo 10 kg incluyendo el contenedor.</li>
+        <li><strong>Contenedor:</strong> Flexible (máx. 55x35x25 cm).</li>
+        <li><strong>Cantidad:</strong> Una (1) mascota debajo del asiento delantero.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row align-items-center mb-5 flex-md-row-reverse">
+    <div class="col-md-5 text-center">
+      <img src="{% static 'images/mascotas/bodega.svg' %}" alt="Mascota en bodega" class="img-fluid">
+    </div>
+    <div class="col-md-7 bg-light rounded p-4 shadow-sm">
+      <h3 class="fw-bold mb-3">Mascotas en bodega</h3>
+      <ul>
+        <li><strong>Peso:</strong> Máximo 70 kg con contenedor.</li>
+        <li><strong>Contenedor:</strong> Rígido que permita moverse.</li>
+        <li><strong>Cantidad:</strong> Cada mascota debe ir en su propio contenedor.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row align-items-center mb-5">
+    <div class="col-md-5 text-center">
+      <img src="{% static 'images/mascotas/soporte-emocional.svg' %}" alt="Soporte emocional" class="img-fluid">
+    </div>
+    <div class="col-md-7 bg-light rounded p-4 shadow-sm">
+      <h3 class="fw-bold mb-3">Perros de soporte emocional</h3>
+      <ul>
+        <li><strong>Peso:</strong> Hasta 10 kg en cabina, hasta 70 kg en bodega.</li>
+        <li><strong>Contenedor:</strong> Flexible (cabina), rígido (bodega).</li>
+        <li><strong>Cantidad:</strong> Máximo uno (1) por pasajero.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row align-items-center mb-5 flex-md-row-reverse">
+    <div class="col-md-5 text-center">
+      <img src="{% static 'images/mascotas/servicio.svg' %}" alt="Perro de servicio" class="img-fluid">
+    </div>
+    <div class="col-md-7 bg-light rounded p-4 shadow-sm">
+      <h3 class="fw-bold mb-3">Perros de servicio</h3>
+      <ul>
+        <li><strong>Peso:</strong> Sin restricción.</li>
+        <li><strong>Contenedor:</strong> No se requiere.</li>
+        <li><strong>Cantidad:</strong> Hasta dos (2) por pasajero.</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="my-5">
+
+ <section class="info-extra py-5">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-5">Información adicional para viajar con tu mascota</h2>
+
+    <div class="row g-4">
+
+      <!-- Card 1 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 rounded-4 p-3">
+          <div class="card-body">
+            <h5 class="fw-bold text-primary mb-3">
+              <i class="bi bi-file-earmark-text-fill me-2"></i>Documentación requerida
+            </h5>
+            <ul>
+              <li>Certificado de salud (máx. 10 días antes del vuelo).</li>
+              <li>Certificado de vacunación vigente.</li>
+              <li>Documento del propietario.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 rounded-4 p-3">
+          <div class="card-body">
+            <h5 class="fw-bold text-danger mb-3">
+              <i class="bi bi-heart-fill me-2"></i>Antes del vuelo
+            </h5>
+            <ul>
+              <li>No alimentes a tu mascota 2 h antes del vuelo.</li>
+              <li>Incluye una manta o juguete en su contenedor.</li>
+              <li>Acostúmbrala al contenedor previamente.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 rounded-4 p-3">
+          <div class="card-body">
+            <h5 class="fw-bold text-info mb-3">
+              <i class="bi bi-airplane-engines me-2"></i>Durante el vuelo
+            </h5>
+            <ul>
+              <li>No abras el contenedor en cabina.</li>
+              <li>Habla en tono suave si lo necesita.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 rounded-4 p-3">
+          <div class="card-body">
+            <h5 class="fw-bold text-warning mb-3">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>Restricciones
+            </h5>
+            <ul class="text-danger">
+              <li>No se aceptan mascotas en celo o agresivas.</li>
+              <li>No menores de 8 semanas.</li>
+              <li>Evita llevar mascotas enfermas o con mal olor.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 rounded-4 p-3">
+          <div class="card-body">
+            <h5 class="fw-bold text-success mb-3">
+              <i class="bi bi-stars me-2"></i>¿Por qué viajar con tu mascota?
+            </h5>
+            <p>Fortalece su vínculo emocional y te brinda compañía, confianza y felicidad durante tu aventura.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 rounded-4 p-3">
+          <div class="card-body">
+            <h5 class="fw-bold text-secondary mb-3">
+              <i class="bi bi-chat-dots-fill me-2"></i>Atención personalizada
+            </h5>
+            <p class="mb-1">¿Dudas? Estamos para ayudarte:</p>
+            <ul class="mb-0">
+              <li><strong>WhatsApp:</strong> +57 312 478 3081</li>
+              <li><strong>Email:</strong> mascotas@aerounaula.com</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -171,7 +171,7 @@
         <div class="card rounded-4 shadow-sm overflow-hidden h-100 d-flex flex-row">
           <!-- Imagen -->
           <div class="w-50">
-            <img src="{% static 'images/hoteles/SkyLine.jpg' %}" alt="Hotel SkyLine" class="w-100 h-100 object-fit-cover">
+            <img src="{% static 'images/hoteles/hotelSkyline.jpg' %}" alt="Hotel SkyLine" class="w-100 h-100 object-fit-cover">
           </div>
           <!-- Contenido -->
           <div class="p-3 w-50 d-flex flex-column justify-content-between">
@@ -261,13 +261,15 @@
         </div>
 
         <div class="col">
+          <a href="{% url 'info_mascotas' %}" class="text-decoration-none text-dark h-100 d-block">
             <div class="card-info">
-                <img src="{% static 'images/descarga.jpg' %}" alt="Fraude">
+                <img src="{% static 'images/mascotas/heroMascota.png' %}" alt="información mascotas">
                 <div class="card-info-body">
-                    <h5>Aún no</h5>
-                    <p>¡Todavía no podemos despegar!</p>
+                    <h5>Mascotas</h5>
+                    <p>¡Viaja con tu amigo peludo con seguridad, confianza y buena compañía!</p>
                 </div>
             </div>
+          </a>
         </div>
 
         <div class="col">

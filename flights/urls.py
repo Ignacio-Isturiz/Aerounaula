@@ -11,6 +11,7 @@ urlpatterns = [
     path('asiento/cancelar/<int:asiento_id>/', views.cancelar_asiento, name='cancelar_asiento'),
     path('descargar-tiquetes/', views.descargar_tiquetes_pdf, name='descargar_tiquetes'),
     path('info/equipaje/', views.info_equipaje, name='info_equipaje'),
+    path('mascotas/', views.info_mascotas, name='info_mascotas'),
     path('sobre-nosotros/', views.sobre_nosotros, name='sobre_nosotros'),
     path('asientos_ajax/<str:vuelo_codigo>/<int:reserva_id>/', views.asientos_ajax, name='asientos_ajax'),
     path('mis-asientos/', views.mis_asientos, name='mis_asientos'),

@@ -80,7 +80,6 @@ def create_user_view(request):
                 id_rol_id=request.POST.get('id_rol'),
                 estado=True
             )
-            messages.success(request, 'Usuario creado exitosamente')
         except Exception as e:
             messages.error(request, f'Error al crear usuario: {str(e)}')
     return redirect('manage_users')
@@ -94,7 +93,6 @@ def edit_user_view(request, user_id):
             usuario.id_rol_id = request.POST.get('id_rol')
             usuario.estado = request.POST.get('estado') == 'on'
             usuario.save()
-            messages.success(request, 'Usuario actualizado exitosamente')
         except Exception as e:
             messages.error(request, f'Error al actualizar usuario: {str(e)}')
     return redirect('manage_users')
@@ -104,7 +102,6 @@ def delete_user_view(request, user_id):
     if request.method == 'POST':
         try:
             usuario.delete()
-            messages.success(request, 'Usuario eliminado exitosamente')
         except Exception as e:
             messages.error(request, f'Error al eliminar usuario: {str(e)}')
     return redirect('manage_users')
@@ -161,7 +158,6 @@ def create_flight_view(request):
                 estado=request.POST.get('estado'),
                 imagen_url=request.POST.get('imagen_url')
             )
-            messages.success(request, 'Vuelo creado exitosamente')
         except Exception as e:
             messages.error(request, f'Error al crear vuelo: {str(e)}')
     return redirect('manage_flights')
@@ -177,7 +173,6 @@ def edit_flight_view(request, flight_code):
             vuelo.estado = request.POST.get('estado')
             vuelo.imagen_url = request.POST.get('imagen_url')
             vuelo.save()
-            messages.success(request, 'Vuelo actualizado exitosamente')
         except Exception as e:
             messages.error(request, f'Error al actualizar vuelo: {str(e)}')
     return redirect('manage_flights')
@@ -187,7 +182,6 @@ def delete_flight_view(request, flight_code):
     if request.method == 'POST':
         try:
             vuelo.delete()
-            messages.success(request, 'Vuelo eliminado exitosamente')
         except Exception as e:
             messages.error(request, f'Error al eliminar vuelo: {str(e)}')
     return redirect('manage_flights')
@@ -220,7 +214,6 @@ def create_reservation_view(request):
                 id_usuario=usuario,
                 vuelo=vuelo
             )
-            messages.success(request, 'Reserva creada exitosamente')
             return JsonResponse({'success': True})
         except Exception as e:
             messages.error(request, f'Error al crear reserva: {str(e)}')
@@ -234,7 +227,6 @@ def edit_reservation_view(request, reservation_id):
             vuelo = get_object_or_404(Vuelos, codigo=request.POST.get('vuelo_codigo'))
             reserva.vuelo = vuelo
             reserva.save()
-            messages.success(request, 'Reserva actualizada exitosamente')
             return JsonResponse({'success': True})
         except Exception as e:
             messages.error(request, f'Error al actualizar reserva: {str(e)}')
@@ -259,7 +251,6 @@ def cancel_reservation_view(request, reservation_id):
                 fail_silently=False,
             )
             
-            messages.success(request, 'Reserva cancelada y usuario notificado')
             return JsonResponse({'success': True})
         except Exception as e:
             messages.error(request, f'Error al cancelar reserva: {str(e)}')
@@ -271,7 +262,6 @@ def delete_reservation_view(request, reservation_id):
     if request.method == 'POST':
         try:
             reserva.delete()
-            messages.success(request, 'Reserva eliminada exitosamente')
             return JsonResponse({'success': True})
         except Exception as e:
             messages.error(request, f'Error al eliminar reserva: {str(e)}')
@@ -352,7 +342,6 @@ def create_seat_view(request):
                     fail_silently=True
                 )
 
-            messages.success(request, 'Asiento creado o actualizado exitosamente.')
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
         return redirect('manage_seats')
@@ -379,7 +368,6 @@ def edit_seat_view(request, seat_id):
                     fail_silently=True
                 )
 
-            messages.success(request, 'Asiento actualizado exitosamente.')
             return redirect('manage_seats')
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
@@ -412,6 +400,5 @@ def delete_seat_view(request, seat_id):
                 fail_silently=True
             )
 
-        messages.success(request, 'Asignación del asiento eliminada correctamente.')
     return redirect('manage_seats')
 
