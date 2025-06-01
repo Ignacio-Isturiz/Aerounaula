@@ -1,6 +1,7 @@
-# asistente/views.py
 from django.shortcuts import render
-from .ia import procesar_mensaje
+from .services.procesador_mensajes import ProcesadorMensajes
+
+procesador = ProcesadorMensajes()
 
 def chat_view(request):
     historial = request.session.get("chat_historial", [])
@@ -8,7 +9,7 @@ def chat_view(request):
 
     if request.method == "POST":
         mensaje = request.POST.get("mensaje", "")
-        respuesta = procesar_mensaje(mensaje)
+        respuesta = procesador.procesar(mensaje)
         historial.append({"user": mensaje, "bot": respuesta})
         request.session["chat_historial"] = historial
 
