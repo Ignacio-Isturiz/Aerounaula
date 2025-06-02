@@ -5,6 +5,7 @@
 {% block title %}Vuelos Disponibles - Aerounaula{% endblock %}
 
 {% block content %}
+
 <div class="header-search-section">
     <div class="container text-center py-5">
         <h1 class="text-white mb-3">Encuentra tu vuelo perfecto</h1>
@@ -56,7 +57,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="section-title">Vuelos disponibles</h2>
         {% if vuelos.count > 0 %}
-            <span class="text-muted">{{ vuelos.count }} vuelos encontrados</span>
+            <span class="text-muted">{{ vuelos.paginator.count }} vuelos encontrados</span>
         {% endif %}
     </div>
 
@@ -137,27 +138,31 @@
         </div>
         {% endfor %}
 
-        {% if vuelos.has_other_pages %}
+        {% if vuelos.paginator.num_pages %}
         <div class="d-flex justify-content-center mt-4">
             <nav aria-label="Page navigation">
                 <ul class="pagination custom-pagination">
                     {% if vuelos.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ vuelos.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> < </a>
+                            <a class="page-link" href="?page={{ vuelos.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">‹</a>
                         </li>
                     {% endif %}
+                    
                     {% for i in vuelos.paginator.page_range %}
                         {% if vuelos.number == i %}
-                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                            <li class="page-item active">
+                                <span class="page-link">{{ i }}</span>
+                            </li>
                         {% else %}
                             <li class="page-item">
                                 <a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a>
                             </li>
                         {% endif %}
                     {% endfor %}
+                        
                     {% if vuelos.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ vuelos.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"> > </a>
+                            <a class="page-link" href="?page={{ vuelos.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">›</a>
                         </li>
                     {% endif %}
                 </ul>

@@ -1,18 +1,29 @@
 from django.urls import path
-from . import views
+
+from flights.views.vuelos_views import VuelosListView
+from flights.views.reserva_views import ReservarVueloView, MisReservasView, CancelarReservaView
+from flights.views.asiento_views import (
+    AsignarAsientosView,
+    ConfirmarAsientosView,
+    CancelarAsientoView,
+    AsientosAjaxView,
+    MisAsientosView
+)
+from flights.views.pdf_views import DescargarTiquetesPDFView
+from flights.views.info_views import InfoEquipajeView, SobreNosotrosView, InfoMascotasView
 
 urlpatterns = [
-    path('vuelos/', views.vuelos_view, name='vuelos'),
-    path('reservar/<str:codigo>/', views.reservar_vuelo, name='reservar_vuelo'),
-    path('mis-reservas/', views.mis_reservas, name='mis_reservas'),
-    path('asientos/<str:codigo>/', views.asignar_asientos, name='asignar_asientos'),
-    path('confirmar-asientos/', views.confirmar_asientos, name='confirmar_asientos'),
-    path('reservas/cancelar/<int:id_reserva>/', views.cancelar_reserva, name='cancelar_reserva'),
-    path('asiento/cancelar/<int:asiento_id>/', views.cancelar_asiento, name='cancelar_asiento'),
-    path('descargar-tiquetes/', views.descargar_tiquetes_pdf, name='descargar_tiquetes'),
-    path('info/equipaje/', views.info_equipaje, name='info_equipaje'),
-    path('mascotas/', views.info_mascotas, name='info_mascotas'),
-    path('sobre-nosotros/', views.sobre_nosotros, name='sobre_nosotros'),
-    path('asientos_ajax/<str:vuelo_codigo>/<int:reserva_id>/', views.asientos_ajax, name='asientos_ajax'),
-    path('mis-asientos/', views.mis_asientos, name='mis_asientos'),
+    path('vuelos/', VuelosListView.as_view(), name='vuelos'),
+    path('reservar/<str:codigo>/', ReservarVueloView.as_view(), name='reservar_vuelo'),
+    path('mis-reservas/', MisReservasView.as_view(), name='mis_reservas'),
+    path('asientos/<str:codigo>/', AsignarAsientosView.as_view(), name='asignar_asientos'),
+    path('confirmar-asientos/', ConfirmarAsientosView.as_view(), name='confirmar_asientos'),
+    path('reservas/cancelar/<int:id_reserva>/', CancelarReservaView.as_view(), name='cancelar_reserva'),
+    path('asiento/cancelar/<int:asiento_id>/', CancelarAsientoView.as_view(), name='cancelar_asiento'),
+    path('descargar-tiquetes/', DescargarTiquetesPDFView.as_view(), name='descargar_tiquetes'),
+    path('info/equipaje/', InfoEquipajeView.as_view(), name='info_equipaje'),
+    path('mascotas/', InfoMascotasView.as_view(), name='info_mascotas'),
+    path('sobre-nosotros/', SobreNosotrosView.as_view(), name='sobre_nosotros'),
+    path('asientos_ajax/<str:vuelo_codigo>/<int:reserva_id>/', AsientosAjaxView.as_view(), name='asientos_ajax'),
+    path('mis-asientos/', MisAsientosView.as_view(), name='mis_asientos'),
 ]
